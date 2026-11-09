@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import App from '../App.js';
 
-describe('ShebaConnect Phase 1 — Frontend Base UI Tests', () => {
+describe('ShebaConnect Phase 2 — Frontend UI & Auth Modal Tests', () => {
   beforeEach(() => {
     localStorage.clear();
   });
@@ -20,22 +20,18 @@ describe('ShebaConnect Phase 1 — Frontend Base UI Tests', () => {
   it('toggles language between Bangla and English', () => {
     render(<App />);
 
-    // Toggle button initially shows option to switch to English
     const toggleBtn = screen.getByTitle('Change Language / ভাষা পরিবর্তন');
     expect(toggleBtn).toBeInTheDocument();
     expect(toggleBtn).toHaveTextContent('English');
 
-    // Click to switch to English
     fireEvent.click(toggleBtn);
 
-    // Verify brand and hero switch to English
     const enBrandTitles = screen.getAllByText('ShebaConnect');
     expect(enBrandTitles.length).toBeGreaterThanOrEqual(1);
     expect(
       screen.getByText('Reliable Local Home Services at Your Fingertips')
     ).toBeInTheDocument();
 
-    // Verify toggle button now shows option to switch back to বাংলা
     expect(toggleBtn).toHaveTextContent('বাংলা');
   });
 
@@ -47,5 +43,28 @@ describe('ShebaConnect Phase 1 — Frontend Base UI Tests', () => {
     expect(screen.getByText('মিরপুর')).toBeInTheDocument();
     expect(screen.getByText('ধানমন্ডি')).toBeInTheDocument();
     expect(screen.getByText('গুলশান')).toBeInTheDocument();
+  });
+
+  it('opens and closes the AuthModal when clicking Login', () => {
+    render(<App />);
+
+    const loginBtns = screen.getAllByText('লগইন');
+    expect(loginBtns.length).toBeGreaterThanOrEqual(1);
+
+    // Click first login button
+    fireEvent.click(loginBtns[0]!);
+
+    // Modal should be open showing "লগইন করুন" header
+    expect(screen.getByRole('heading', { name: 'লগইন করুন' })).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('ইমেইল বা মোবাইল নম্বর দিন')).toBeInTheDocument();
+
+    // Switch to Register within modal
+    const registerToggle = screen.getByText('নিবন্ধন করুন');
+    fireEvent.click(registerToggle);
+
+    expect(screen.getByRole('heading', { name: 'নতুন একাউন্ট তৈরি করুন' })).toBeInTheDocument();
+    expect(screen.getByText('গ্রাহক')).toBeInTheDocument();
+    expect(screen.getByText('টেকনিশিয়ান')).toBeInTheDocument();
+    expect(screen.getByText('কোম্পানি')).toBeInTheDocument();
   });
 });

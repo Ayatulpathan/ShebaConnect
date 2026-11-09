@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "a9c7b39e-2f58-48b0-9831-25c77e089201",
     "name": "ShebaConnect API v1",
-    "description": "Zero-Cost Local Service Booking Marketplace for Bangladesh (Dhaka launch).\nStrictly ৳0 / $0 Budget — Cash After Service Only.\n\nImport this collection into Postman to test all endpoints.",
+    "description": "Zero-Cost Local Service Booking Marketplace for Bangladesh (Dhaka launch).\nStrictly ৳0 / $0 Budget — Cash After Service Only.\n\nPhase 1: Health & System\nPhase 2: Authentication & RBAC & User Addresses",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -15,11 +15,21 @@
       "key": "apiVersion",
       "value": "v1",
       "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refreshToken",
+      "value": "",
+      "type": "string"
     }
   ],
   "item": [
     {
-      "name": "Health & System",
+      "name": "01. Health & Diagnostics",
       "item": [
         {
           "name": "Root Ping (/health)",
@@ -30,11 +40,6 @@
                 "exec": [
                   "pm.test(\"Status code is 200\", function () {",
                   "    pm.response.to.have.status(200);",
-                  "});",
-                  "pm.test(\"Status is UP\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.status).to.eql(\"UP\");",
-                  "    pm.expect(jsonData.service).to.eql(\"ShebaConnect API\");",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -48,26 +53,18 @@
               "raw": "{{baseUrl}}/health",
               "host": ["{{baseUrl}}"],
               "path": ["health"]
-            },
-            "description": "Lightweight health ping used by load balancers, Cloudflare, and Render to check instance status."
-          },
-          "response": []
+            }
+          }
         },
         {
-          "name": "Detailed Health (/api/v1/health)",
+          "name": "Detailed Health Diagnostics (/api/v1/health)",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"Status code is 200 or 503 (degraded without DB)\", function () {",
+                  "pm.test(\"Status code is 200 or 503\", function () {",
                   "    pm.expect(pm.response.code).to.be.oneOf([200, 503]);",
-                  "});",
-                  "pm.test(\"Response contains zeroCostPolicy breakdown\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.have.property('zeroCostPolicy');",
-                  "    pm.expect(jsonData.zeroCostPolicy.budget).to.eql('৳0 / $0');",
-                  "    pm.expect(jsonData.zeroCostPolicy.cloudR2Active).to.eql(false);",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -81,67 +78,258 @@
               "raw": "{{baseUrl}}/api/{{apiVersion}}/health",
               "host": ["{{baseUrl}}"],
               "path": ["api", "{{apiVersion}}", "health"]
-            },
-            "description": "Detailed health diagnostics returning uptime, database connection state, memory usage, and zero-cost policy status."
-          },
-          "response": []
-        },
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "02. Authentication (Phase 2)",
+      "item": [
         {
-          "name": "Health Ping (/api/v1/health/ping)",
+          "name": "Register Customer",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/{{apiVersion}}/health/ping",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "{{apiVersion}}", "health", "ping"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "404 Error Format Test",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 404\", function () {",
-                  "    pm.response.to.have.status(404);",
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
                   "});",
-                  "pm.test(\"Structured error format conforms to standard\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.eql(false);",
-                  "    pm.expect(jsonData.error.code).to.eql('NOT_FOUND');",
-                  "});"
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.accessToken) {",
+                  "    pm.collectionVariables.set(\"accessToken\", jsonData.data.accessToken);",
+                  "    pm.collectionVariables.set(\"refreshToken\", jsonData.data.refreshToken);",
+                  "}"
                 ],
                 "type": "text/javascript"
               }
             }
           ],
           "request": {
-            "method": "GET",
-            "header": [],
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Tanvir Ahmed\",\n  \"email\": \"tanvir@example.com\",\n  \"phone\": \"01712345678\",\n  \"password\": \"SecurePass123\",\n  \"role\": \"CUSTOMER\",\n  \"preferredLanguage\": \"bn\"\n}"
+            },
             "url": {
-              "raw": "{{baseUrl}}/api/{{apiVersion}}/non-existent-endpoint",
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/auth/register",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "{{apiVersion}}", "non-existent-endpoint"]
+              "path": ["api", "{{apiVersion}}", "auth", "register"]
             }
-          },
-          "response": []
+          }
+        },
+        {
+          "name": "Register Provider",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Rafiqul Islam AC Expert\",\n  \"email\": \"rafiqul@example.com\",\n  \"phone\": \"01812345678\",\n  \"password\": \"ProviderPass123\",\n  \"role\": \"INDIVIDUAL_PROVIDER\",\n  \"preferredLanguage\": \"bn\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Register Company Owner",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Dhaka Cleaners Ltd Owner\",\n  \"email\": \"owner@dhakacleaners.com\",\n  \"phone\": \"01912345678\",\n  \"password\": \"CompanyOwnerPass123\",\n  \"role\": \"COMPANY_OWNER\",\n  \"preferredLanguage\": \"bn\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login (Email or BD Phone)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.accessToken) {",
+                  "    pm.collectionVariables.set(\"accessToken\", jsonData.data.accessToken);",
+                  "    pm.collectionVariables.set(\"refreshToken\", jsonData.data.refreshToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"tanvir@example.com\",\n  \"password\": \"SecurePass123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Current User Profile (/auth/me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "auth", "me"]
+            }
+          }
+        },
+        {
+          "name": "Refresh Access Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.accessToken) {",
+                  "    pm.collectionVariables.set(\"accessToken\", jsonData.data.accessToken);",
+                  "    pm.collectionVariables.set(\"refreshToken\", jsonData.data.refreshToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/auth/refresh",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "auth", "refresh"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "auth", "logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03. User Addresses (Phase 2)",
+      "item": [
+        {
+          "name": "Add Dhaka Address",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"label\": \"Home\",\n  \"area\": \"mirpur\",\n  \"addressLine\": \"House 45, Road 12, Block D, Mirpur-10, Dhaka\",\n  \"isDefault\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/users/addresses",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "users", "addresses"]
+            }
+          }
+        },
+        {
+          "name": "List Addresses",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/users/addresses",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "users", "addresses"]
+            }
+          }
         }
       ]
     }

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext.js';
 import { HealthStatusBadge } from './HealthStatusBadge.js';
+import { UserMenu } from './UserMenu.js';
 import { Globe, Menu, X, Wrench } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
@@ -8,7 +9,7 @@ export const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+    <nav className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           {/* Logo & Brand */}
@@ -44,7 +45,7 @@ export const Navbar: React.FC = () => {
             </a>
           </div>
 
-          {/* Right Actions: Language Switcher, Auth Buttons */}
+          {/* Right Actions: Language Switcher, User Menu */}
           <div className="hidden sm:flex items-center space-x-3">
             {/* Language Switcher */}
             <button
@@ -56,13 +57,8 @@ export const Navbar: React.FC = () => {
               <span>{language === 'bn' ? 'English' : 'বাংলা'}</span>
             </button>
 
-            {/* Auth Buttons */}
-            <button className="px-3.5 py-1.5 text-sm font-medium text-gray-700 hover:text-brand-600 transition-colors">
-              {t.nav.login}
-            </button>
-            <button className="px-4 py-2 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-sm transition-colors">
-              {t.nav.register}
-            </button>
+            {/* Auth / User Menu */}
+            <UserMenu />
           </div>
 
           {/* Mobile Menu Button */}
@@ -109,13 +105,8 @@ export const Navbar: React.FC = () => {
               {t.nav.howItWorks}
             </a>
           </div>
-          <div className="pt-2 border-t border-gray-200 flex flex-col gap-2">
-            <button className="w-full py-2 text-center text-sm font-medium text-gray-700 border border-gray-300 rounded-lg">
-              {t.nav.login}
-            </button>
-            <button className="w-full py-2 text-center text-sm font-semibold text-white bg-brand-600 rounded-lg shadow-sm">
-              {t.nav.register}
-            </button>
+          <div className="pt-2 border-t border-gray-200">
+            <UserMenu />
           </div>
         </div>
       )}
