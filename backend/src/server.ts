@@ -33,6 +33,8 @@ const startServer = async () => {
     // Connect to database (non-blocking for initial local tests if DB is down)
     try {
       await connectDatabase();
+      const { seedInitialMarketplace } = await import('./config/seed.js');
+      await seedInitialMarketplace();
     } catch (dbErr) {
       logger.warn(
         'Database connection could not be established at launch. Server continuing in degraded mode for development/testing.'

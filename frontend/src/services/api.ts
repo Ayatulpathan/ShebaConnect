@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { HealthResponse, AuthResponse } from '../types/index.js';
+import type { HealthResponse, AuthResponse, Category, Service } from '../types/index.js';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
 
@@ -71,4 +71,32 @@ apiClient.interceptors.response.use(
 export const checkHealth = async (): Promise<HealthResponse> => {
   const response = await apiClient.get<HealthResponse>('/health');
   return response.data;
+};
+
+// Marketplace API
+export const fetchCategories = async (): Promise<Category[]> => {
+  const response = await apiClient.get<{ success: boolean; data: { categories: Category[] } }>(
+    '/categories'
+  );
+  return response.data.data.categories;
+};
+
+export const fetchServices = async (categoryId?: string): Promise<Service[]> => {
+  const url = categoryId ? `/services?category=${categoryId}` : '/services';
+  const response = await apiClient.get<{ success: boolean; data: { services: Service[] } }>(url);
+  return response.data.data.services;
+};
+
+export const searchServices = async (params: {
+  q?: string;
+  category?: string;
+  area?: string;
+  minPrice?: number;
+  maxPrice?: number;
+}): Promise<{ services: Service[]; pagination: { total: number } }> => {
+  const response = await apiClient.get<{
+    success: boolean;
+    data: { services: Service[]; pagination: { total: number } };
+  }>('/services/search', { params });
+  return response.data.data;
 };

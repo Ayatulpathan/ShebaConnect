@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "a9c7b39e-2f58-48b0-9831-25c77e089201",
     "name": "ShebaConnect API v1",
-    "description": "Zero-Cost Local Service Booking Marketplace for Bangladesh (Dhaka launch).\nStrictly ৳0 / $0 Budget — Cash After Service Only.\n\nPhase 1: Health & System\nPhase 2: Authentication & RBAC & User Addresses",
+    "description": "Zero-Cost Local Service Booking Marketplace for Bangladesh (Dhaka launch).\nStrictly ৳0 / $0 Budget — Cash After Service Only.\n\nPhase 1: Health & System Diagnostics\nPhase 2: Authentication, RBAC & Address Management\nPhase 3: Marketplace Categories, Services, Search & Provider Listings",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -25,6 +25,16 @@
       "key": "refreshToken",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "categoryId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "serviceId",
+      "value": "",
+      "type": "string"
     }
   ],
   "item": [
@@ -33,19 +43,6 @@
       "item": [
         {
           "name": "Root Ping (/health)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -58,19 +55,6 @@
         },
         {
           "name": "Detailed Health Diagnostics (/api/v1/health)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 200 or 503\", function () {",
-                  "    pm.expect(pm.response.code).to.be.oneOf([200, 503]);",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -84,7 +68,7 @@
       ]
     },
     {
-      "name": "02. Authentication (Phase 2)",
+      "name": "02. Authentication",
       "item": [
         {
           "name": "Register Customer",
@@ -93,9 +77,6 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"Status code is 201 Created\", function () {",
-                  "    pm.response.to.have.status(201);",
-                  "});",
                   "var jsonData = pm.response.json();",
                   "if (jsonData.data && jsonData.data.accessToken) {",
                   "    pm.collectionVariables.set(\"accessToken\", jsonData.data.accessToken);",
@@ -108,12 +89,7 @@
           ],
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"Tanvir Ahmed\",\n  \"email\": \"tanvir@example.com\",\n  \"phone\": \"01712345678\",\n  \"password\": \"SecurePass123\",\n  \"role\": \"CUSTOMER\",\n  \"preferredLanguage\": \"bn\"\n}"
@@ -126,57 +102,12 @@
           }
         },
         {
-          "name": "Register Provider",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Rafiqul Islam AC Expert\",\n  \"email\": \"rafiqul@example.com\",\n  \"phone\": \"01812345678\",\n  \"password\": \"ProviderPass123\",\n  \"role\": \"INDIVIDUAL_PROVIDER\",\n  \"preferredLanguage\": \"bn\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/{{apiVersion}}/auth/register",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "{{apiVersion}}", "auth", "register"]
-            }
-          }
-        },
-        {
-          "name": "Register Company Owner",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Dhaka Cleaners Ltd Owner\",\n  \"email\": \"owner@dhakacleaners.com\",\n  \"phone\": \"01912345678\",\n  \"password\": \"CompanyOwnerPass123\",\n  \"role\": \"COMPANY_OWNER\",\n  \"preferredLanguage\": \"bn\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/{{apiVersion}}/auth/register",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "{{apiVersion}}", "auth", "register"]
-            }
-          }
-        },
-        {
-          "name": "Login (Email or BD Phone)",
+          "name": "Login (Email or Phone)",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"Status code is 200 OK\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
                   "var jsonData = pm.response.json();",
                   "if (jsonData.data && jsonData.data.accessToken) {",
                   "    pm.collectionVariables.set(\"accessToken\", jsonData.data.accessToken);",
@@ -189,12 +120,7 @@
           ],
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"identifier\": \"tanvir@example.com\",\n  \"password\": \"SecurePass123\"\n}"
@@ -210,124 +136,162 @@
           "name": "Get Current User Profile (/auth/me)",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{accessToken}}"
-              }
-            ],
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
             "url": {
               "raw": "{{baseUrl}}/api/{{apiVersion}}/auth/me",
               "host": ["{{baseUrl}}"],
               "path": ["api", "{{apiVersion}}", "auth", "me"]
             }
           }
-        },
+        }
+      ]
+    },
+    {
+      "name": "04. Categories (Phase 3)",
+      "item": [
         {
-          "name": "Refresh Access Token",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "var jsonData = pm.response.json();",
-                  "if (jsonData.data && jsonData.data.accessToken) {",
-                  "    pm.collectionVariables.set(\"accessToken\", jsonData.data.accessToken);",
-                  "    pm.collectionVariables.set(\"refreshToken\", jsonData.data.refreshToken);",
-                  "}"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
+          "name": "Get All Categories",
           "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
-            },
+            "method": "GET",
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/{{apiVersion}}/auth/refresh",
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/categories",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "{{apiVersion}}", "auth", "refresh"]
+              "path": ["api", "{{apiVersion}}", "categories"]
             }
           }
         },
         {
-          "name": "Logout",
+          "name": "Get Category by Slug",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/categories/ac-servicing",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "categories", "ac-servicing"]
+            }
+          }
+        },
+        {
+          "name": "Create Category (Admin Only)",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{accessToken}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+              "raw": "{\n  \"name\": {\n    \"en\": \"Solar Panel Servicing\",\n    \"bn\": \"সোলার প্যানেল সার্ভিসিং\"\n  },\n  \"slug\": \"solar-servicing\",\n  \"description\": {\n    \"en\": \"Installation and solar inverter repair in Dhaka\",\n    \"bn\": \"সোলার প্যানেল ও ইনভার্টার মেরামত\"\n  },\n  \"icon\": \"Sun\",\n  \"order\": 11\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/{{apiVersion}}/auth/logout",
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/categories",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "{{apiVersion}}", "auth", "logout"]
+              "path": ["api", "{{apiVersion}}", "categories"]
             }
           }
         }
       ]
     },
     {
-      "name": "03. User Addresses (Phase 2)",
+      "name": "05. Services & Search (Phase 3)",
       "item": [
         {
-          "name": "Add Dhaka Address",
+          "name": "List All Services",
           "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{accessToken}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"label\": \"Home\",\n  \"area\": \"mirpur\",\n  \"addressLine\": \"House 45, Road 12, Block D, Mirpur-10, Dhaka\",\n  \"isDefault\": true\n}"
-            },
+            "method": "GET",
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/{{apiVersion}}/users/addresses",
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/services",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "{{apiVersion}}", "users", "addresses"]
+              "path": ["api", "{{apiVersion}}", "services"]
             }
           }
         },
         {
-          "name": "List Addresses",
+          "name": "Search Services (Keyword + Area + Price Range)",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{accessToken}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/{{apiVersion}}/users/addresses",
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/services/search?q=ac&area=mirpur&minPrice=300&maxPrice=3000",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "{{apiVersion}}", "users", "addresses"]
+              "path": ["api", "{{apiVersion}}", "services", "search"],
+              "query": [
+                { "key": "q", "value": "ac" },
+                { "key": "area", "value": "mirpur" },
+                { "key": "minPrice", "value": "300" },
+                { "key": "maxPrice", "value": "3000" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Service (Admin Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": {\n    \"en\": \"AC Gas Refill (R410A / R32)\",\n    \"bn\": \"এসি গ্যাস রিফিল\"\n  },\n  \"slug\": \"ac-gas-refill\",\n  \"category\": \"{{categoryId}}\",\n  \"description\": {\n    \"en\": \"Genuine AC refrigerant gas leak check and full refill\",\n    \"bn\": \"জেনুইন এসি গ্যাস রিফিল ও লিকেজ মেরামত\"\n  },\n  \"basePrice\": 2500,\n  \"pricingType\": \"STARTING_PRICE\",\n  \"estimatedDurationMinutes\": 60\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/services",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "services"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "06. Provider Listings & Discovery (Phase 3)",
+      "item": [
+        {
+          "name": "Create/Update Provider Listing",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"serviceId\": \"{{serviceId}}\",\n  \"serviceAreas\": [\"mirpur\", \"dhanmondi\", \"gulshan\"],\n  \"experienceYears\": 5,\n  \"customPrice\": 1100\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/providers/listings",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "providers", "listings"]
+            }
+          }
+        },
+        {
+          "name": "Get My Provider Listings",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/providers/listings/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "providers", "listings", "me"]
+            }
+          }
+        },
+        {
+          "name": "Discover Providers in Dhaka Area",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/providers?area=mirpur",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "providers"],
+              "query": [{ "key": "area", "value": "mirpur" }]
             }
           }
         }

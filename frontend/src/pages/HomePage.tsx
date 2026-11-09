@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '../context/LanguageContext.js';
+import { fetchCategories, searchServices } from '../services/api.js';
+import { ServiceCard } from '../components/ServiceCard.js';
+import type { Service } from '../types/index.js';
 import {
   Search,
   MapPin,
@@ -13,6 +17,8 @@ import {
   Hammer,
   Tv,
   ArrowRight,
+  Filter,
+  Wrench,
 } from 'lucide-react';
 
 const DHAKA_AREAS = [
@@ -27,7 +33,7 @@ const DHAKA_AREAS = [
   { id: 'old-dhaka', en: 'Old Dhaka', bn: 'পুরান ঢাকা' },
 ];
 
-const INITIAL_CATEGORIES = [
+const FALLBACK_CATEGORIES = [
   { id: 'ac-repair', icon: Wind, en: 'AC Servicing & Repair', bn: 'এসি সার্ভিসিং ও মেরামত' },
   { id: 'electrical', icon: Zap, en: 'Electrical Services', bn: 'ইলেকট্রিক্যাল সার্ভিস' },
   { id: 'plumbing', icon: Droplets, en: 'Plumbing', bn: 'প্লাম্বিং সার্ভিস' },
@@ -42,13 +48,36 @@ export const HomePage: React.FC = () => {
   const { language, t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedArea, setSelectedArea] = useState('');
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+
+  // Fetch live categories from backend
+  const { data: categories } = useQuery({
+    queryKey: ['categories'],
+    queryFn: fetchCategories,
+    retry: 1,
+  });
+
+  // Fetch services based on search, area, and selected category
+  const { data: searchResults } = useQuery({
+    queryKey: ['services', searchTerm, selectedArea, activeCategory],
+    queryFn: () =>
+      searchServices({
+        q: searchTerm || undefined,
+        area: selectedArea || undefined,
+        category: activeCategory || undefined,
+      }),
+    retry: 1,
+  });
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+  };
+
+  const handleBookService = (service: Service) => {
     alert(
       language === 'bn'
-        ? `অনুসন্ধান: "${searchTerm || 'সকল সেবা'}", এলাকা: ${selectedArea || 'সমগ্র ঢাকা'}`
-        : `Searching: "${searchTerm || 'All services'}" in ${selectedArea || 'All Dhaka'}`
+        ? `"${service.name.bn}" সেবার বুকিং শীঘ্রই উন্মুক্ত হবে (Phase 5 Booking Engine)`
+        : `Booking for "${service.name.en}" will be available in Phase 5`
     );
   };
 
@@ -132,39 +161,94 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Popular Categories Grid */}
-      <section id="categories" className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
-        <div className="text-center mb-10">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">{t.popularCategories}</h2>
-          <p className="mt-2 text-sm text-gray-500">
-            {language === 'bn'
-              ? 'আমাদের অনুমোদিত অভিজ্ঞ পেশাদারদের সেবাসমূহ'
-              : 'Reliable on-demand maintenance by verified experts'}
-          </p>
+      {/* Categories Bar */}
+      <section id="categories" className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+        <div className="flex justify-between items-end mb-8">
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">{t.popularCategories}</h2>
+            <p className="mt-1 text-xs text-gray-500">
+              {language === 'bn' ? 'সকল অনুমোদিত সেবা ক্যাটাগরি' : 'Explore verified categories across Dhaka'}
+            </p>
+          </div>
+
+          {activeCategory && (
+            <button
+              onClick={() => setActiveCategory(null)}
+              className="text-xs text-brand-600 font-bold hover:underline flex items-center gap-1"
+            >
+              <Filter className="w-3.5 h-3.5" />
+              <span>{language === 'bn' ? 'ফিল্টার মুছুন' : 'Clear Category Filter'}</span>
+            </button>
+          )}
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-          {INITIAL_CATEGORIES.map((cat) => {
-            const IconComponent = cat.icon;
-            return (
-              <div
-                key={cat.id}
-                className="bg-white p-5 rounded-2xl border border-gray-200 hover:border-brand-500 hover:shadow-md transition-all cursor-pointer group flex flex-col items-center text-center"
-              >
-                <div className="w-14 h-14 rounded-2xl bg-brand-50 group-hover:bg-brand-600 text-brand-600 group-hover:text-white flex items-center justify-center mb-3 transition-colors">
-                  <IconComponent className="w-7 h-7" />
-                </div>
-                <h3 className="text-sm font-semibold text-gray-900 group-hover:text-brand-600 transition-colors">
-                  {language === 'bn' ? cat.bn : cat.en}
-                </h3>
-                <span className="text-xs text-gray-400 mt-1">
-                  {language === 'bn' ? 'ক্যাশ অন ডেলিভারি' : 'Cash after service'}
-                </span>
-              </div>
-            );
-          })}
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+          {categories && categories.length > 0
+            ? categories.map((cat) => {
+                const isSelected = activeCategory === cat._id;
+                return (
+                  <button
+                    key={cat._id}
+                    onClick={() => setActiveCategory(isSelected ? null : cat._id)}
+                    className={`p-4 rounded-2xl border text-left transition-all flex flex-col justify-between ${
+                      isSelected
+                        ? 'border-brand-600 bg-brand-50 shadow-md ring-2 ring-brand-500'
+                        : 'border-gray-200 bg-white hover:border-brand-500 hover:shadow-sm'
+                    }`}
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center mb-3">
+                      <Wrench className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-xs font-bold text-gray-900 leading-snug">
+                        {language === 'bn' ? cat.name.bn : cat.name.en}
+                      </h3>
+                    </div>
+                  </button>
+                );
+              })
+            : FALLBACK_CATEGORIES.map((cat) => {
+                const IconComponent = cat.icon;
+                return (
+                  <div
+                    key={cat.id}
+                    className="p-4 rounded-2xl border border-gray-200 bg-white flex flex-col justify-between"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center mb-3">
+                      <IconComponent className="w-5 h-5" />
+                    </div>
+                    <h3 className="text-xs font-bold text-gray-900 leading-snug">
+                      {language === 'bn' ? cat.bn : cat.en}
+                    </h3>
+                  </div>
+                );
+              })}
         </div>
       </section>
+
+      {/* Services Grid (Live Search Results) */}
+      {searchResults?.services && searchResults.services.length > 0 && (
+        <section id="services" className="py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xl font-bold text-gray-900">
+              {language === 'bn' ? 'উপলব্ধ সেবাসমূহ' : 'Available Services'}
+              <span className="text-sm font-normal text-gray-500 ml-2">
+                ({searchResults.pagination.total} {language === 'bn' ? 'টি সেবা' : 'services'})
+              </span>
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {searchResults.services.map((service) => (
+              <ServiceCard
+                key={service._id}
+                service={service}
+                onBook={handleBookService}
+              />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 };

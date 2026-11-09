@@ -9,6 +9,13 @@ export type UserRole =
   | 'ADMIN'
   | 'SUPPORT_AGENT';
 
+export type PricingType =
+  | 'FIXED_PRICE'
+  | 'STARTING_PRICE'
+  | 'HOURLY_PRICE'
+  | 'INSPECTION_REQUIRED'
+  | 'CUSTOM_QUOTATION';
+
 export interface UserAddress {
   _id: string;
   label: string;
@@ -30,6 +37,52 @@ export interface User {
   avatarUrl?: string;
   addresses: UserAddress[];
   createdAt: string;
+}
+
+export interface Category {
+  _id: string;
+  slug: string;
+  name: {
+    en: string;
+    bn: string;
+  };
+  description: {
+    en: string;
+    bn: string;
+  };
+  icon: string;
+  order: number;
+  isActive: boolean;
+}
+
+export interface Service {
+  _id: string;
+  slug: string;
+  name: {
+    en: string;
+    bn: string;
+  };
+  category: Category | string;
+  description: {
+    en: string;
+    bn: string;
+  };
+  images: string[];
+  basePrice: number; // In BDT (৳)
+  pricingType: PricingType;
+  estimatedDurationMinutes: number;
+  requirements: string[];
+  isActive: boolean;
+}
+
+export interface ProviderListing {
+  _id: string;
+  provider: User;
+  service: Service;
+  customPrice?: number;
+  serviceAreas: string[];
+  experienceYears: number;
+  isActive: boolean;
 }
 
 export interface AuthResponse {
