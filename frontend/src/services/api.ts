@@ -1,5 +1,14 @@
 import axios from 'axios';
-import type { HealthResponse, AuthResponse, Category, Service } from '../types/index.js';
+import type {
+  HealthResponse,
+  AuthResponse,
+  Category,
+  Service,
+  ProviderProfile,
+  AvailabilitySlot,
+  Organization,
+  OrganizationMember,
+} from '../types/index.js';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
 
@@ -99,4 +108,118 @@ export const searchServices = async (params: {
     data: { services: Service[]; pagination: { total: number } };
   }>('/services/search', { params });
   return response.data.data;
+};
+
+// Provider Operations
+export const fetchMyProviderProfile = async (): Promise<ProviderProfile> => {
+  const response = await apiClient.get<{ success: boolean; data: { profile: ProviderProfile } }>(
+    '/providers/operations/profile'
+  );
+  return response.data.data.profile;
+};
+
+export const updateMyProviderProfile = async (data: {
+  bio?: string;
+  skills?: string[];
+  experienceYears?: number;
+  emergencyContact?: string;
+}): Promise<ProviderProfile> => {
+  const response = await apiClient.patch<{ success: boolean; data: { profile: ProviderProfile } }>(
+    '/providers/operations/profile',
+    data
+  );
+  return response.data.data.profile;
+};
+
+export const submitProviderVerification = async (data: {
+  nidNumber: string;
+  nidFrontUrl?: string;
+  nidBackUrl?: string;
+}): Promise<ProviderProfile> => {
+  const response = await apiClient.post<{ success: boolean; data: { profile: ProviderProfile } }>(
+    '/providers/operations/verification',
+    data
+  );
+  return response.data.data.profile;
+};
+
+export const fetchMyAvailability = async (): Promise<AvailabilitySlot[]> => {
+  const response = await apiClient.get<{
+    success: boolean;
+    data: { availabilitySlots: AvailabilitySlot[] };
+  }>('/providers/operations/availability');
+  return response.data.data.availabilitySlots;
+};
+
+export const updateMyAvailability = async (
+  slots: AvailabilitySlot[]
+): Promise<AvailabilitySlot[]> => {
+  const response = await apiClient.put<{
+    success: boolean;
+    data: { availabilitySlots: AvailabilitySlot[] };
+  }>('/providers/operations/availability', { slots });
+  return response.data.data.availabilitySlots;
+};
+
+// Company Operations
+export const createCompany = async (data: {
+  businessName: string;
+  tradeLicenseNumber?: string;
+  contactPhone: string;
+  contactEmail?: string;
+  serviceAreas: string[];
+}): Promise<Organization> => {
+  const response = await apiClient.post<{
+    success: boolean;
+    data: { organization: Organization };
+  }>('/companies', data);
+  return response.data.data.organization;
+};
+
+export const fetchMyCompany = async (): Promise<Organization | null> => {
+  const response = await apiClient.get<{
+    success: boolean;
+    data: { organization: Organization | null };
+  }>('/companies/my');
+  return response.data.data.organization;
+};
+
+export const updateMyCompany = async (
+  orgId: string,
+  data: Partial<Organization>
+): Promise<Organization> => {
+  const response = await apiClient.patch<{
+    success: boolean;
+    data: { organization: Organization };
+  }>(`/companies/${orgId}`, data);
+  return response.data.data.organization;
+};
+
+export const fetchCompanyMembers = async (orgId: string): Promise<OrganizationMember[]> => {
+  const response = await apiClient.get<{
+    success: boolean;
+    data: { members: OrganizationMember[] };
+  }>(`/companies/${orgId}/members`);
+  return response.data.data.members;
+};
+
+export const addCompanyMember = async (
+  orgId: string,
+  data: {
+    userId: string;
+    role: 'COMPANY_STAFF' | 'TECHNICIAN';
+  }
+): Promise<OrganizationMember> => {
+  const response = await apiClient.post<{
+    success: boolean;
+    data: { member: OrganizationMember };
+  }>(`/companies/${orgId}/members`, data);
+  return response.data.data.member;
+};
+
+export const removeCompanyMember = async (
+  orgId: string,
+  memberId: string
+): Promise<void> => {
+  await apiClient.delete(`/companies/${orgId}/members/${memberId}`);
 };

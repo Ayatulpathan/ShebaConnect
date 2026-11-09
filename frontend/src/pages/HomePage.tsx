@@ -20,18 +20,7 @@ import {
   Filter,
   Wrench,
 } from 'lucide-react';
-
-const DHAKA_AREAS = [
-  { id: 'mirpur', en: 'Mirpur', bn: 'মিরপুর' },
-  { id: 'dhanmondi', en: 'Dhanmondi', bn: 'ধানমন্ডি' },
-  { id: 'gulshan', en: 'Gulshan', bn: 'গুলশান' },
-  { id: 'banani', en: 'Banani', bn: 'বনানী' },
-  { id: 'uttara', en: 'Uttara', bn: 'উত্তরা' },
-  { id: 'mohammadpur', en: 'Mohammadpur', bn: 'মোহাম্মদপুর' },
-  { id: 'badda', en: 'Badda', bn: 'বাড্ডা' },
-  { id: 'motijheel', en: 'Motijheel', bn: 'মতিঝিল' },
-  { id: 'old-dhaka', en: 'Old Dhaka', bn: 'পুরান ঢাকা' },
-];
+import { DHAKA_AREAS } from '../constants/areas.js';
 
 const FALLBACK_CATEGORIES = [
   { id: 'ac-repair', icon: Wind, en: 'AC Servicing & Repair', bn: 'এসি সার্ভিসিং ও মেরামত' },

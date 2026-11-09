@@ -2,13 +2,17 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext.js';
 import { useLanguage } from '../context/LanguageContext.js';
 import { AuthModal } from './AuthModal.js';
-import { User, LogOut, ChevronDown, MapPin, Shield } from 'lucide-react';
+import { ProviderOperationsModal } from './ProviderOperationsModal.js';
+import { CompanyOperationsModal } from './CompanyOperationsModal.js';
+import { User, LogOut, ChevronDown, MapPin, Shield, Wrench, Building2 } from 'lucide-react';
 
 export const UserMenu: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const { language, t } = useLanguage();
 
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [providerModalOpen, setProviderModalOpen] = useState(false);
+  const [companyModalOpen, setCompanyModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'login' | 'register'>('login');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -123,6 +127,32 @@ export const UserMenu: React.FC = () => {
               <span>{language === 'bn' ? 'ঠিকানা সমূহ' : 'Saved Addresses'}</span>
             </button>
 
+            {user.role === 'INDIVIDUAL_PROVIDER' && (
+              <button
+                onClick={() => {
+                  setDropdownOpen(false);
+                  setProviderModalOpen(true);
+                }}
+                className="w-full flex items-center gap-2.5 px-4 py-2 hover:bg-brand-50 text-left text-brand-700 font-semibold"
+              >
+                <Wrench className="w-4 h-4 text-brand-600" />
+                <span>{language === 'bn' ? 'টেকনিশিয়ান হাব' : 'Technician Hub'}</span>
+              </button>
+            )}
+
+            {user.role === 'COMPANY_OWNER' && (
+              <button
+                onClick={() => {
+                  setDropdownOpen(false);
+                  setCompanyModalOpen(true);
+                }}
+                className="w-full flex items-center gap-2.5 px-4 py-2 hover:bg-purple-50 text-left text-purple-700 font-semibold"
+              >
+                <Building2 className="w-4 h-4 text-purple-600" />
+                <span>{language === 'bn' ? 'কোম্পানি ম্যানেজমেন্ট' : 'Company Management'}</span>
+              </button>
+            )}
+
             {user.role === 'ADMIN' && (
               <button
                 onClick={() => setDropdownOpen(false)}
@@ -148,6 +178,16 @@ export const UserMenu: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Operations Modals */}
+      <ProviderOperationsModal
+        isOpen={providerModalOpen}
+        onClose={() => setProviderModalOpen(false)}
+      />
+      <CompanyOperationsModal
+        isOpen={companyModalOpen}
+        onClose={() => setCompanyModalOpen(false)}
+      />
     </div>
   );
 };

@@ -16,13 +16,22 @@ export type PricingType =
   | 'INSPECTION_REQUIRED'
   | 'CUSTOM_QUOTATION';
 
+export type VerificationStatus =
+  | 'UNVERIFIED'
+  | 'PENDING_REVIEW'
+  | 'VERIFIED'
+  | 'REJECTED'
+  | 'SUSPENDED';
+
+export type OrganizationApprovalStatus = 'PENDING_APPROVAL' | 'APPROVED' | 'REJECTED' | 'SUSPENDED';
+
 export interface UserAddress {
-  _id: string;
+  _id?: string;
   label: string;
   area: string;
   addressLine: string;
   isDefault: boolean;
-  createdAt: string;
+  createdAt?: string;
 }
 
 export interface User {
@@ -37,6 +46,52 @@ export interface User {
   avatarUrl?: string;
   addresses: UserAddress[];
   createdAt: string;
+}
+
+export interface ProviderProfile {
+  _id: string;
+  user: string | User;
+  bio?: string;
+  skills: string[];
+  experienceYears: number;
+  emergencyContact?: string;
+  nidNumber?: string;
+  nidFrontUrl?: string;
+  nidBackUrl?: string;
+  verificationStatus: VerificationStatus;
+  verificationRejectionReason?: string;
+  totalCompletedJobs: number;
+  ratingAverage: number;
+  ratingCount: number;
+}
+
+export interface Organization {
+  _id: string;
+  owner: string | User;
+  businessName: string;
+  tradeLicenseNumber?: string;
+  businessAddress?: UserAddress;
+  contactEmail?: string;
+  contactPhone: string;
+  serviceAreas: string[];
+  verificationStatus: VerificationStatus;
+  isActive: boolean;
+}
+
+export interface OrganizationMember {
+  _id: string;
+  organization: string | Organization;
+  user: User;
+  role: 'COMPANY_STAFF' | 'TECHNICIAN';
+  isActive: boolean;
+}
+
+export interface AvailabilitySlot {
+  _id?: string;
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+  isAvailable: boolean;
 }
 
 export interface Category {

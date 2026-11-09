@@ -35,6 +35,16 @@
       "key": "serviceId",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "organizationId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "memberId",
+      "value": "",
+      "type": "string"
     }
   ],
   "item": [
@@ -292,6 +302,190 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "{{apiVersion}}", "providers"],
               "query": [{ "key": "area", "value": "mirpur" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "07. Provider Operations (Phase 4)",
+      "item": [
+        {
+          "name": "Get Provider Profile",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/providers/operations/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "providers", "operations", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Update Provider Bio & Skills",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bio\": \"Expert HVAC and Inverter AC specialist in Dhaka\",\n  \"skills\": [\"AC Jet Wash\", \"PCB Repair\", \"Gas Charging\"],\n  \"experienceYears\": 7,\n  \"emergencyContact\": \"01711223344\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/providers/operations/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "providers", "operations", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Submit NID Verification (Zero-Cost)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nidNumber\": \"19901234567890123\",\n  \"nidFrontUrl\": \"mock://local-docs/nid-front.jpg\",\n  \"nidBackUrl\": \"mock://local-docs/nid-back.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/providers/operations/verification",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "providers", "operations", "verification"]
+            }
+          }
+        },
+        {
+          "name": "Get Availability Slots",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/providers/operations/availability",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "providers", "operations", "availability"]
+            }
+          }
+        },
+        {
+          "name": "Update Availability Slots",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"slots\": [\n    { \"dayOfWeek\": 0, \"startTime\": \"09:00\", \"endTime\": \"18:00\", \"isAvailable\": true },\n    { \"dayOfWeek\": 1, \"startTime\": \"09:00\", \"endTime\": \"18:00\", \"isAvailable\": true },\n    { \"dayOfWeek\": 2, \"startTime\": \"09:00\", \"endTime\": \"18:00\", \"isAvailable\": true },\n    { \"dayOfWeek\": 3, \"startTime\": \"09:00\", \"endTime\": \"18:00\", \"isAvailable\": true },\n    { \"dayOfWeek\": 4, \"startTime\": \"09:00\", \"endTime\": \"18:00\", \"isAvailable\": true },\n    { \"dayOfWeek\": 5, \"startTime\": \"09:00\", \"endTime\": \"18:00\", \"isAvailable\": false },\n    { \"dayOfWeek\": 6, \"startTime\": \"10:00\", \"endTime\": \"17:00\", \"isAvailable\": true }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/providers/operations/availability",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "providers", "operations", "availability"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "08. Company Operations (Phase 4)",
+      "item": [
+        {
+          "name": "Register Company Organization",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"businessName\": \"Dhaka Pro Servicing Ltd.\",\n  \"tradeLicenseNumber\": \"TRAD/DNCC/098765/2026\",\n  \"contactPhone\": \"01711223344\",\n  \"contactEmail\": \"contact@dhakapro.com\",\n  \"serviceAreas\": [\"mirpur\", \"dhanmondi\", \"gulshan\", \"banani\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/companies",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "companies"]
+            }
+          }
+        },
+        {
+          "name": "Get My Company",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/companies/my",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "companies", "my"]
+            }
+          }
+        },
+        {
+          "name": "Update Company Details",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"businessName\": \"Dhaka Pro Servicing & Repairs Co.\",\n  \"serviceAreas\": [\"mirpur\", \"dhanmondi\", \"gulshan\", \"banani\", \"uttara\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/companies/{{organizationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "companies", "{{organizationId}}"]
+            }
+          }
+        },
+        {
+          "name": "List Company Members / Technicians",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/companies/{{organizationId}}/members",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "companies", "{{organizationId}}", "members"]
+            }
+          }
+        },
+        {
+          "name": "Add Member / Technician to Company",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"<TECHNICIAN_USER_ID>\",\n  \"role\": \"TECHNICIAN\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/companies/{{organizationId}}/members",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "companies", "{{organizationId}}", "members"]
+            }
+          }
+        },
+        {
+          "name": "Remove Member from Company",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/companies/{{organizationId}}/members/{{memberId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "companies", "{{organizationId}}", "members", "{{memberId}}"]
             }
           }
         }
