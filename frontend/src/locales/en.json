@@ -1,0 +1,38 @@
+{
+  "brandName": "ShebaConnect",
+  "tagline": "Trusted Local Service Marketplace in Dhaka",
+  "nav": {
+    "home": "Home",
+    "services": "Browse Services",
+    "categories": "Categories",
+    "howItWorks": "How It Works",
+    "login": "Login",
+    "register": "Register",
+    "becomeProvider": "Become a Provider"
+  },
+  "hero": {
+    "title": "Reliable Local Home Services at Your Fingertips",
+    "subtitle": "Connect directly with verified independent technicians and professional service companies. Pay in cash after the job is completed.",
+    "searchPlaceholder": "What service do you need? (e.g. AC Repair, Plumbing, Electrician)",
+    "areaPlaceholder": "Select Area (e.g. Mirpur, Dhanmondi, Gulshan)",
+    "searchButton": "Search Services"
+  },
+  "popularCategories": "Popular Categories",
+  "badges": {
+    "zeroCostNotice": "Operated with ৳0 platform fees & cash-after-service transparency",
+    "cashOnly": "Cash After Service",
+    "verifiedPros": "Verified Technicians",
+    "coverage": "Dhaka City Coverage"
+  },
+  "systemStatus": {
+    "live": "Server Live",
+    "wakingUp": "Server Waking Up...",
+    "offline": "Offline"
+  },
+  "footer": {
+    "copyright": "© 2026 ShebaConnect. All rights reserved.",
+    "dhakaNotice": "Initial Launch Area: Dhaka Metropolitan Area",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service"
+  }
+}
