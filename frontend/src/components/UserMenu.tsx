@@ -4,7 +4,17 @@ import { useLanguage } from '../context/LanguageContext.js';
 import { AuthModal } from './AuthModal.js';
 import { ProviderOperationsModal } from './ProviderOperationsModal.js';
 import { CompanyOperationsModal } from './CompanyOperationsModal.js';
-import { User, LogOut, ChevronDown, MapPin, Shield, Wrench, Building2 } from 'lucide-react';
+import { BookingTrackerModal } from './BookingTrackerModal.js';
+import {
+  User,
+  LogOut,
+  ChevronDown,
+  MapPin,
+  Shield,
+  Wrench,
+  Building2,
+  CalendarCheck,
+} from 'lucide-react';
 
 export const UserMenu: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -13,6 +23,7 @@ export const UserMenu: React.FC = () => {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [providerModalOpen, setProviderModalOpen] = useState(false);
   const [companyModalOpen, setCompanyModalOpen] = useState(false);
+  const [trackerModalOpen, setTrackerModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'login' | 'register'>('login');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -127,6 +138,17 @@ export const UserMenu: React.FC = () => {
               <span>{language === 'bn' ? 'ঠিকানা সমূহ' : 'Saved Addresses'}</span>
             </button>
 
+            <button
+              onClick={() => {
+                setDropdownOpen(false);
+                setTrackerModalOpen(true);
+              }}
+              className="w-full flex items-center gap-2.5 px-4 py-2 hover:bg-gray-50 text-left text-gray-800 font-semibold"
+            >
+              <CalendarCheck className="w-4 h-4 text-brand-600" />
+              <span>{language === 'bn' ? 'আমার বুকিং ও ট্র্যাকিং' : 'My Bookings & Tracker'}</span>
+            </button>
+
             {user.role === 'INDIVIDUAL_PROVIDER' && (
               <button
                 onClick={() => {
@@ -187,6 +209,10 @@ export const UserMenu: React.FC = () => {
       <CompanyOperationsModal
         isOpen={companyModalOpen}
         onClose={() => setCompanyModalOpen(false)}
+      />
+      <BookingTrackerModal
+        isOpen={trackerModalOpen}
+        onClose={() => setTrackerModalOpen(false)}
       />
     </div>
   );

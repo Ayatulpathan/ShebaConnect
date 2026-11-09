@@ -4,6 +4,8 @@ import { AppError } from '../utils/AppError.js';
 import { logger } from '../config/logger.js';
 import { env } from '../config/env.js';
 
+export { AppError };
+
 export const errorHandler: ErrorRequestHandler = (
   err: Error | AppError,
   req: Request,
@@ -26,6 +28,7 @@ export const errorHandler: ErrorRequestHandler = (
 
     res.status(err.statusCode).json({
       success: false,
+      errorCode: err.errorCode,
       error: {
         code: err.errorCode,
         message: err.message,
@@ -54,6 +57,7 @@ export const errorHandler: ErrorRequestHandler = (
 
     res.status(400).json({
       success: false,
+      errorCode: 'VALIDATION_ERROR',
       error: {
         code: 'VALIDATION_ERROR',
         message: 'Invalid request payload or parameters',

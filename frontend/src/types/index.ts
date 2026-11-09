@@ -175,3 +175,79 @@ export interface DhakaArea {
   nameBn: string;
   zone: 'North' | 'South';
 }
+
+export type BookingStatus =
+  | 'REQUESTED'
+  | 'ACCEPTED'
+  | 'SCHEDULED'
+  | 'PROVIDER_ASSIGNED'
+  | 'ON_THE_WAY'
+  | 'IN_PROGRESS'
+  | 'COMPLETED'
+  | 'REJECTED'
+  | 'CANCELLED'
+  | 'EXPIRED'
+  | 'DISPUTED';
+
+export interface BookingAddress {
+  area: string;
+  addressLine: string;
+  contactPhone: string;
+  contactName: string;
+}
+
+export interface Booking {
+  _id: string;
+  id?: string;
+  bookingNumber: string;
+  customer: User | any;
+  service: Service | any;
+  provider?: User | any;
+  organization?: Organization | any;
+  technician?: User | any;
+  status: BookingStatus;
+  problemDescription: string;
+  serviceAddress: BookingAddress;
+  scheduledDate: string;
+  preferredTimeSlot: string;
+  pricingType: PricingType;
+  basePrice: number;
+  finalPrice: number;
+  isPaid: boolean;
+  paymentMethod: string;
+  cancellationReason?: string;
+  rejectionReason?: string;
+  completedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface QuoteItem {
+  description: string;
+  amount: number;
+}
+
+export interface Quote {
+  _id: string;
+  id?: string;
+  booking: string;
+  provider: User | any;
+  organization?: Organization | any;
+  amount: number;
+  breakdown: QuoteItem[];
+  notes?: string;
+  validUntil: string;
+  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED';
+  createdAt: string;
+}
+
+export interface BookingStatusHistory {
+  _id: string;
+  booking: string;
+  previousStatus?: BookingStatus;
+  newStatus: BookingStatus;
+  changedBy: User | any;
+  actorRole: UserRole;
+  reason?: string;
+  createdAt: string;
+}

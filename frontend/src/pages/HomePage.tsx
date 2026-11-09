@@ -3,7 +3,10 @@ import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '../context/LanguageContext.js';
 import { fetchCategories, searchServices } from '../services/api.js';
 import { ServiceCard } from '../components/ServiceCard.js';
-import type { Service } from '../types/index.js';
+import { BookingModal } from '../components/BookingModal.js';
+import { BookingTrackerModal } from '../components/BookingTrackerModal.js';
+import { AuthModal } from '../components/AuthModal.js';
+import type { Service, Booking } from '../types/index.js';
 import {
   Search,
   MapPin,
@@ -62,12 +65,21 @@ export const HomePage: React.FC = () => {
     e.preventDefault();
   };
 
+  const [selectedServiceForBooking, setSelectedServiceForBooking] = useState<Service | null>(null);
+  const [bookingModalOpen, setBookingModalOpen] = useState(false);
+  const [trackerModalOpen, setTrackerModalOpen] = useState(false);
+  const [activeBookingId, setActiveBookingId] = useState<string | undefined>(undefined);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+
   const handleBookService = (service: Service) => {
-    alert(
-      language === 'bn'
-        ? `"${service.name.bn}" সেবার বুকিং শীঘ্রই উন্মুক্ত হবে (Phase 5 Booking Engine)`
-        : `Booking for "${service.name.en}" will be available in Phase 5`
-    );
+    setSelectedServiceForBooking(service);
+    setBookingModalOpen(true);
+  };
+
+  const handleBookingSuccess = (booking: Booking) => {
+    setBookingModalOpen(false);
+    setActiveBookingId(booking._id);
+    setTrackerModalOpen(true);
   };
 
   return (
@@ -238,6 +250,30 @@ export const HomePage: React.FC = () => {
           </div>
         </section>
       )}
+
+      {/* Booking Modals */}
+      <BookingModal
+        isOpen={bookingModalOpen}
+        service={selectedServiceForBooking}
+        onClose={() => setBookingModalOpen(false)}
+        onBookingSuccess={handleBookingSuccess}
+        onRequireAuth={() => {
+          setBookingModalOpen(false);
+          setAuthModalOpen(true);
+        }}
+      />
+
+      <BookingTrackerModal
+        isOpen={trackerModalOpen}
+        initialBookingId={activeBookingId}
+        onClose={() => setTrackerModalOpen(false)}
+      />
+
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        initialMode="login"
+      />
     </div>
   );
 };

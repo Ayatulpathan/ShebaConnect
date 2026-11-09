@@ -8,3 +8,31 @@ export const PRICING_TYPES = {
 
 export type PricingType = (typeof PRICING_TYPES)[keyof typeof PRICING_TYPES];
 export const ALL_PRICING_TYPES: PricingType[] = Object.values(PRICING_TYPES);
+
+export const BOOKING_STATUSES = {
+  REQUESTED: 'REQUESTED',
+  ACCEPTED: 'ACCEPTED',
+  SCHEDULED: 'SCHEDULED',
+  PROVIDER_ASSIGNED: 'PROVIDER_ASSIGNED',
+  ON_THE_WAY: 'ON_THE_WAY',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  REJECTED: 'REJECTED',
+  CANCELLED: 'CANCELLED',
+  EXPIRED: 'EXPIRED',
+  DISPUTED: 'DISPUTED',
+} as const;
+
+export type BookingStatus = (typeof BOOKING_STATUSES)[keyof typeof BOOKING_STATUSES];
+export const ALL_BOOKING_STATUSES: BookingStatus[] = Object.values(BOOKING_STATUSES);
+
+export const QUOTE_STATUSES = {
+  PENDING: 'PENDING',
+  ACCEPTED: 'ACCEPTED',
+  REJECTED: 'REJECTED',
+  EXPIRED: 'EXPIRED',
+} as const;
+
+export type QuoteStatus = (typeof QUOTE_STATUSES)[keyof typeof QUOTE_STATUSES];
+export const ALL_QUOTE_STATUSES: QuoteStatus[] = Object.values(QUOTE_STATUSES);
+

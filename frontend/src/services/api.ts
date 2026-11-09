@@ -8,6 +8,10 @@ import type {
   AvailabilitySlot,
   Organization,
   OrganizationMember,
+  Booking,
+  BookingAddress,
+  Quote,
+  BookingStatusHistory,
 } from '../types/index.js';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
@@ -222,4 +226,101 @@ export const removeCompanyMember = async (
   memberId: string
 ): Promise<void> => {
   await apiClient.delete(`/companies/${orgId}/members/${memberId}`);
+};
+
+// Booking & Quotation Operations
+export const createBooking = async (data: {
+  serviceId: string;
+  providerId?: string;
+  organizationId?: string;
+  problemDescription: string;
+  serviceAddress: BookingAddress;
+  scheduledDate: string;
+  preferredTimeSlot: string;
+}): Promise<Booking> => {
+  const response = await apiClient.post<{ success: boolean; data: { booking: Booking } }>(
+    '/bookings',
+    data
+  );
+  return response.data.data.booking;
+};
+
+export const fetchBooking = async (bookingId: string): Promise<Booking> => {
+  const response = await apiClient.get<{ success: boolean; data: { booking: Booking } }>(
+    `/bookings/${bookingId}`
+  );
+  return response.data.data.booking;
+};
+
+export const fetchBookings = async (params?: {
+  status?: string;
+  page?: number;
+  limit?: number;
+}): Promise<{ bookings: Booking[]; pagination: { total: number; page: number; limit: number } }> => {
+  const response = await apiClient.get<{
+    success: boolean;
+    data: { bookings: Booking[]; pagination: { total: number; page: number; limit: number } };
+  }>('/bookings', { params });
+  return response.data.data;
+};
+
+export const transitionBookingStatus = async (
+  bookingId: string,
+  data: {
+    status: string;
+    reason?: string;
+    technicianId?: string;
+    quoteId?: string;
+    finalPrice?: number;
+  }
+): Promise<Booking> => {
+  const response = await apiClient.patch<{
+    success: boolean;
+    data: { booking: Booking };
+  }>(`/bookings/${bookingId}/status`, data);
+  return response.data.data.booking;
+};
+
+export const fetchBookingHistory = async (
+  bookingId: string
+): Promise<BookingStatusHistory[]> => {
+  const response = await apiClient.get<{
+    success: boolean;
+    data: { history: BookingStatusHistory[] };
+  }>(`/bookings/${bookingId}/history`);
+  return response.data.data.history;
+};
+
+export const createQuote = async (
+  bookingId: string,
+  data: {
+    amount: number;
+    breakdown?: Array<{ description: string; amount: number }>;
+    notes?: string;
+    validUntil: string;
+  }
+): Promise<Quote> => {
+  const response = await apiClient.post<{ success: boolean; data: { quote: Quote } }>(
+    `/bookings/${bookingId}/quotes`,
+    data
+  );
+  return response.data.data.quote;
+};
+
+export const fetchQuotes = async (bookingId: string): Promise<Quote[]> => {
+  const response = await apiClient.get<{ success: boolean; data: { quotes: Quote[] } }>(
+    `/bookings/${bookingId}/quotes`
+  );
+  return response.data.data.quotes;
+};
+
+export const respondToQuote = async (
+  quoteId: string,
+  action: 'ACCEPT' | 'REJECT'
+): Promise<{ quote: Quote; booking?: Booking }> => {
+  const response = await apiClient.post<{
+    success: boolean;
+    data: { quote: Quote; booking?: Booking };
+  }>(`/bookings/quotes/${quoteId}/respond`, { action });
+  return response.data.data;
 };

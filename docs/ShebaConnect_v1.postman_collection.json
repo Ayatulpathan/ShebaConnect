@@ -45,6 +45,16 @@
       "key": "memberId",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "bookingId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "quoteId",
+      "value": "",
+      "type": "string"
     }
   ],
   "item": [
@@ -486,6 +496,139 @@
               "raw": "{{baseUrl}}/api/{{apiVersion}}/companies/{{organizationId}}/members/{{memberId}}",
               "host": ["{{baseUrl}}"],
               "path": ["api", "{{apiVersion}}", "companies", "{{organizationId}}", "members", "{{memberId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "09. Booking Engine (Phase 5)",
+      "item": [
+        {
+          "name": "Create Booking Request (Customer)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"serviceId\": \"{{serviceId}}\",\n  \"problemDescription\": \"AC indoor unit leaking water and weak airflow\",\n  \"serviceAddress\": {\n    \"area\": \"mirpur\",\n    \"addressLine\": \"House 12, Road 4, Section 10\",\n    \"contactPhone\": \"01712345678\",\n    \"contactName\": \"Rahim Customer\"\n  },\n  \"scheduledDate\": \"2026-11-20T10:00:00.000Z\",\n  \"preferredTimeSlot\": \"Morning (09:00 AM - 12:00 PM)\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/bookings",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "bookings"]
+            }
+          }
+        },
+        {
+          "name": "List Bookings (Role-Scoped)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/bookings?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "bookings"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Booking Details",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/bookings/{{bookingId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "bookings", "{{bookingId}}"]
+            }
+          }
+        },
+        {
+          "name": "Transition Booking Status (State Machine)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ACCEPTED\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/bookings/{{bookingId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "bookings", "{{bookingId}}", "status"]
+            }
+          }
+        },
+        {
+          "name": "Get Booking Audit History",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/bookings/{{bookingId}}/history",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "bookings", "{{bookingId}}", "history"]
+            }
+          }
+        },
+        {
+          "name": "Submit Provider Quotation",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 3500,\n  \"breakdown\": [\n    { \"description\": \"Refrigerant Gas (R410A)\", \"amount\": 2200 },\n    { \"description\": \"Copper pipe brazing & labor\", \"amount\": 1300 }\n  ],\n  \"notes\": \"Includes 30 days service warranty for leakages\",\n  \"validUntil\": \"2026-12-01T00:00:00.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/bookings/{{bookingId}}/quotes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "bookings", "{{bookingId}}", "quotes"]
+            }
+          }
+        },
+        {
+          "name": "List Quotations for Booking",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/bookings/{{bookingId}}/quotes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "bookings", "{{bookingId}}", "quotes"]
+            }
+          }
+        },
+        {
+          "name": "Respond to Quotation (Customer Accept/Reject)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"ACCEPT\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/bookings/quotes/{{quoteId}}/respond",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "bookings", "quotes", "{{quoteId}}", "respond"]
             }
           }
         }

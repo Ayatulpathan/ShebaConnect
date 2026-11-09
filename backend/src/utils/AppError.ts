@@ -5,11 +5,22 @@ export class AppError extends Error {
   public readonly isOperational: boolean;
 
   constructor(
-    statusCode: number,
-    message: string,
+    statusCodeOrMessage: number | string,
+    messageOrStatusCode: string | number,
     errorCode: string = 'INTERNAL_ERROR',
     details?: unknown
   ) {
+    let statusCode: number;
+    let message: string;
+
+    if (typeof statusCodeOrMessage === 'number') {
+      statusCode = statusCodeOrMessage;
+      message = typeof messageOrStatusCode === 'string' ? messageOrStatusCode : 'Error';
+    } else {
+      message = statusCodeOrMessage;
+      statusCode = typeof messageOrStatusCode === 'number' ? messageOrStatusCode : 500;
+    }
+
     super(message);
     this.statusCode = statusCode;
     this.errorCode = errorCode;
