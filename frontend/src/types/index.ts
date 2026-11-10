@@ -517,4 +517,67 @@ export interface UpdateMemberDTO {
   status?: 'ACTIVE' | 'INACTIVE';
 }
 
+export interface AdminOverviewData {
+  users: {
+    total: number;
+    customers: number;
+    individualProviders: number;
+    registeredCompanies: number;
+    verifiedProviders: number;
+    pendingProviderVerifications: number;
+    pendingCompanyApprovals: number;
+  };
+  bookings: {
+    total: number;
+    completed: number;
+    cancelled: number;
+    disputed: number;
+    activeInProgress: number;
+  };
+  financials: {
+    totalGrossVolumeBDT: number;
+    totalCommissionEarnedBDT: number;
+    totalCommissionPendingBDT: number;
+    totalCommissionSettledBDT: number;
+    settlementsCount: number;
+  };
+}
+
+export interface AdminVerificationApplications {
+  providers: any[];
+  companies: any[];
+}
+
+export interface AdminDispute {
+  booking: Booking;
+  payment?: CashPayment;
+}
+
+export interface AuditLogRecord {
+  _id: string;
+  actor: {
+    _id: string;
+    name: string;
+    email: string;
+    role: string;
+  };
+  actorRole: string;
+  action: string;
+  targetType: string;
+  targetId: string;
+  details: Record<string, unknown>;
+  createdAt: string;
+}
+
+export interface ManualSettlementDTO {
+  providerId?: string;
+  organizationId?: string;
+  entryIds: string[];
+  amountSettled: number;
+  settlementMethod?: string;
+  paymentReference?: string;
+  notes?: string;
+}
+
+
 

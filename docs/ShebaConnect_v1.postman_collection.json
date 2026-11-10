@@ -1093,6 +1093,180 @@
           }
         }
       ]
+    },
+    {
+      "name": "14. Admin Governance & Marketplace Operations",
+      "item": [
+        {
+          "name": "Get Platform Operational Overview",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/admin/overview",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "admin", "overview"]
+            }
+          }
+        },
+        {
+          "name": "Get Platform Users (Search & Filter)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/admin/users?role=CUSTOMER&status=ACTIVE",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "admin", "users"],
+              "query": [
+                { "key": "role", "value": "CUSTOMER" },
+                { "key": "status", "value": "ACTIVE" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update User Status (Suspend/Reactivate)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"SUSPENDED\",\n  \"reason\": \"Repeated non-payment of cash\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/admin/users/{{userId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "admin", "users", "{{userId}}", "status"]
+            }
+          }
+        },
+        {
+          "name": "Get Verification Applications Queue",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/admin/verification-applications",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "admin", "verification-applications"]
+            }
+          }
+        },
+        {
+          "name": "Review Provider Verification",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"VERIFIED\",\n  \"notes\": \"NID documents verified against government records\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/admin/providers/{{providerProfileId}}/verification",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "admin", "providers", "{{providerProfileId}}", "verification"]
+            }
+          }
+        },
+        {
+          "name": "Review Company Approval",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"APPROVED\",\n  \"notes\": \"Trade license verified with DNCC authority\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/admin/companies/{{organizationId}}/approval",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "admin", "companies", "{{organizationId}}", "approval"]
+            }
+          }
+        },
+        {
+          "name": "Get Disputed Bookings Queue",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/admin/disputes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "admin", "disputes"]
+            }
+          }
+        },
+        {
+          "name": "Resolve Booking Dispute",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resolution\": \"RESOLVE_AS_COMPLETED\",\n  \"notes\": \"Customer confirmed technician resolved the leakage\",\n  \"refundOrWaiveFee\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/admin/disputes/{{bookingId}}/resolve",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "admin", "disputes", "{{bookingId}}", "resolve"]
+            }
+          }
+        },
+        {
+          "name": "Record Manual Commission Settlement",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"providerId\": \"{{providerId}}\",\n  \"entryIds\": [\"{{entryId}}\"],\n  \"amountSettled\": 150,\n  \"settlementMethod\": \"MANUAL_CASH_OR_OFFLINE\",\n  \"paymentReference\": \"OFFLINE-HQ-RECEIPT-441\",\n  \"notes\": \"Provider paid commission at Dhaka office\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/admin/settlements",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "admin", "settlements"]
+            }
+          }
+        },
+        {
+          "name": "Get Platform Audit Trail",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/admin/audit-logs",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "admin", "audit-logs"]
+            }
+          }
+        }
+      ]
     }
   ]
 }

@@ -25,6 +25,12 @@ import type {
   CompanyMetrics,
   AddMemberDTO,
   UpdateMemberDTO,
+  AdminOverviewData,
+  AdminVerificationApplications,
+  AdminDispute,
+  AuditLogRecord,
+  ManualSettlementDTO,
+  User,
 } from '../types/index.js';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
@@ -637,6 +643,176 @@ export const fetchCompanyMetrics = async (
   }>(`/companies/${orgId}/metrics`);
   return response.data.data.metrics;
 };
+
+// ==================== Phase 10: Admin Governance & Marketplace Operations ====================
+
+export const fetchAdminOverview = async (): Promise<AdminOverviewData> => {
+  const response = await apiClient.get<{
+    success: boolean;
+    data: AdminOverviewData;
+  }>('/admin/overview');
+  return response.data.data;
+};
+
+export const fetchAdminUsers = async (params?: {
+  role?: string;
+  status?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
+}): Promise<{
+  users: User[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}> => {
+  const response = await apiClient.get<{
+    success: boolean;
+    data: {
+      users: User[];
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    };
+  }>('/admin/users', { params });
+  return response.data.data;
+};
+
+export const updateAdminUserStatus = async (
+  userId: string,
+  status: 'ACTIVE' | 'SUSPENDED' | 'PENDING',
+  reason?: string
+): Promise<User> => {
+  const response = await apiClient.patch<{
+    success: boolean;
+    data: { user: User };
+  }>(`/admin/users/${userId}/status`, { status, reason });
+  return response.data.data.user;
+};
+
+export const fetchAdminVerificationApplications = async (): Promise<AdminVerificationApplications> => {
+  const response = await apiClient.get<{
+    success: boolean;
+    data: AdminVerificationApplications;
+  }>('/admin/verification-applications');
+  return response.data.data;
+};
+
+export const reviewAdminProviderVerification = async (
+  providerId: string,
+  data: {
+    status: 'VERIFIED' | 'REJECTED' | 'PENDING_REVIEW';
+    notes?: string;
+    rejectionReason?: string;
+  }
+): Promise<ProviderProfile> => {
+  const response = await apiClient.patch<{
+    success: boolean;
+    data: { profile: ProviderProfile };
+  }>(`/admin/providers/${providerId}/verification`, data);
+  return response.data.data.profile;
+};
+
+export const reviewAdminCompanyApproval = async (
+  orgId: string,
+  data: {
+    status: 'APPROVED' | 'REJECTED' | 'SUSPENDED' | 'PENDING_APPROVAL';
+    notes?: string;
+  }
+): Promise<Organization> => {
+  const response = await apiClient.patch<{
+    success: boolean;
+    data: { organization: Organization };
+  }>(`/admin/companies/${orgId}/approval`, data);
+  return response.data.data.organization;
+};
+
+export const fetchAdminBookings = async (params?: {
+  status?: string;
+  area?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
+}): Promise<{
+  bookings: Booking[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}> => {
+  const response = await apiClient.get<{
+    success: boolean;
+    data: {
+      bookings: Booking[];
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    };
+  }>('/admin/bookings', { params });
+  return response.data.data;
+};
+
+export const fetchAdminDisputes = async (): Promise<AdminDispute[]> => {
+  const response = await apiClient.get<{
+    success: boolean;
+    data: { disputes: AdminDispute[] };
+  }>('/admin/disputes');
+  return response.data.data.disputes;
+};
+
+export const resolveAdminDispute = async (
+  bookingId: string,
+  data: {
+    resolution: 'RESOLVE_AS_COMPLETED' | 'RESOLVE_AS_CANCELLED';
+    notes: string;
+    refundOrWaiveFee?: boolean;
+  }
+): Promise<Booking> => {
+  const response = await apiClient.post<{
+    success: boolean;
+    data: { booking: Booking };
+  }>(`/admin/disputes/${bookingId}/resolve`, data);
+  return response.data.data.booking;
+};
+
+export const recordAdminSettlement = async (
+  data: ManualSettlementDTO
+): Promise<{ settlement: CommissionSettlement; settledCount: number }> => {
+  const response = await apiClient.post<{
+    success: boolean;
+    data: { settlement: CommissionSettlement; settledCount: number };
+  }>('/admin/settlements', data);
+  return response.data.data;
+};
+
+export const fetchAdminAuditLogs = async (params?: {
+  action?: string;
+  targetType?: string;
+  page?: number;
+  limit?: number;
+}): Promise<{
+  logs: AuditLogRecord[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}> => {
+  const response = await apiClient.get<{
+    success: boolean;
+    data: {
+      logs: AuditLogRecord[];
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    };
+  }>('/admin/audit-logs', { params });
+  return response.data.data;
+};
+
 
 
 

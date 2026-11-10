@@ -7,6 +7,7 @@ import { CompanyDashboardModal } from './CompanyDashboardModal.js';
 import { TechnicianJobsModal } from './TechnicianJobsModal.js';
 import { BookingTrackerModal } from './BookingTrackerModal.js';
 import { ProviderEarningsModal } from './ProviderEarningsModal.js';
+import { AdminDashboardModal } from './AdminDashboardModal.js';
 import {
   User,
   LogOut,
@@ -29,6 +30,7 @@ export const UserMenu: React.FC = () => {
   const [techJobsModalOpen, setTechJobsModalOpen] = useState(false);
   const [trackerModalOpen, setTrackerModalOpen] = useState(false);
   const [earningsModalOpen, setEarningsModalOpen] = useState(false);
+  const [adminModalOpen, setAdminModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'login' | 'register'>('login');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -208,13 +210,16 @@ export const UserMenu: React.FC = () => {
               </button>
             )}
 
-            {user.role === 'ADMIN' && (
+            {['ADMIN', 'SUPPORT_AGENT'].includes(user.role) && (
               <button
-                onClick={() => setDropdownOpen(false)}
-                className="w-full flex items-center gap-2.5 px-4 py-2 hover:bg-gray-50 text-left text-purple-700 font-medium"
+                onClick={() => {
+                  setDropdownOpen(false);
+                  setAdminModalOpen(true);
+                }}
+                className="w-full flex items-center gap-2.5 px-4 py-2 hover:bg-emerald-50 text-left text-emerald-800 font-bold"
               >
-                <Shield className="w-4 h-4 text-purple-500" />
-                <span>{language === 'bn' ? 'অ্যাডমিন ড্যাশবোর্ড' : 'Admin Dashboard'}</span>
+                <Shield className="w-4 h-4 text-emerald-600" />
+                <span>{language === 'bn' ? 'অ্যাডমিন ড্যাশবোর্ড' : 'Admin Governance'}</span>
               </button>
             )}
           </div>
@@ -254,6 +259,11 @@ export const UserMenu: React.FC = () => {
       <ProviderEarningsModal
         isOpen={earningsModalOpen}
         onClose={() => setEarningsModalOpen(false)}
+      />
+      <AdminDashboardModal
+        isOpen={adminModalOpen}
+        onClose={() => setAdminModalOpen(false)}
+        lang={language}
       />
     </div>
   );

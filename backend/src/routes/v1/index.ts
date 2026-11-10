@@ -12,6 +12,7 @@ import { paymentRoutes } from './payment.routes.js';
 import { notificationRoutes } from './notification.routes.js';
 import { chatRoutes } from './chat.routes.js';
 import { reviewRoutes } from './review.routes.js';
+import adminRoutes from './admin.routes.js';
 
 const router = Router();
 
@@ -28,5 +29,6 @@ router.use('/payments', paymentRoutes);
 router.use('/notifications', notificationRoutes);
 router.use('/chat', chatRoutes);
 router.use('/reviews', reviewRoutes);
+router.use('/admin', adminRoutes);
 
 export default router;
