@@ -19,6 +19,8 @@ export interface IService extends Document {
   estimatedDurationMinutes: number;
   requirements: string[];
   isActive: boolean;
+  ratingAverage: number;
+  ratingCount: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -96,6 +98,18 @@ const ServiceSchema = new Schema<IService>(
       type: Boolean,
       default: true,
       index: true,
+    },
+    ratingAverage: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5,
+      index: true,
+    },
+    ratingCount: {
+      type: Number,
+      default: 0,
+      min: 0,
     },
   },
   {

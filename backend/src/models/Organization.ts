@@ -15,6 +15,8 @@ export interface IOrganization extends Document {
   isVerified: boolean;
   logoUrl?: string;
   description?: string;
+  ratingAverage: number;
+  ratingCount: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -84,6 +86,17 @@ const OrganizationSchema = new Schema<IOrganization>(
       type: String,
       trim: true,
       maxlength: 1000,
+    },
+    ratingAverage: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5,
+    },
+    ratingCount: {
+      type: Number,
+      default: 0,
+      min: 0,
     },
   },
   {

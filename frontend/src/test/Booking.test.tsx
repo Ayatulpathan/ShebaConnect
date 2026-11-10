@@ -88,6 +88,7 @@ vi.mock('../services/api.js', () => ({
   confirmCashPayment: vi.fn().mockResolvedValue({}),
   disputeCashPayment: vi.fn().mockResolvedValue({}),
   fetchBookingReceipt: vi.fn().mockResolvedValue({}),
+  fetchBookingReview: vi.fn().mockResolvedValue(null),
 }));
 
 // Mock useAuth

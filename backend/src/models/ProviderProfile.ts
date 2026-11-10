@@ -21,6 +21,9 @@ export interface IProviderProfile extends Document {
   verificationNotes?: string;
   rejectionReason?: string;
   verifiedAt?: Date;
+  ratingAverage: number;
+  ratingCount: number;
+  totalCompletedJobs: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -95,6 +98,22 @@ const ProviderProfileSchema = new Schema<IProviderProfile>(
     },
     verifiedAt: {
       type: Date,
+    },
+    ratingAverage: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5,
+    },
+    ratingCount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    totalCompletedJobs: {
+      type: Number,
+      default: 0,
+      min: 0,
     },
   },
   {

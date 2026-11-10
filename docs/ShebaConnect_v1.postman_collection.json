@@ -52,6 +52,11 @@
       "type": "string"
     },
     {
+      "key": "reviewId",
+      "value": "",
+      "type": "string"
+    },
+    {
       "key": "quoteId",
       "value": "",
       "type": "string"
@@ -888,6 +893,112 @@
               "raw": "{{baseUrl}}/api/{{apiVersion}}/chat/bookings/{{bookingId}}/read",
               "host": ["{{baseUrl}}"],
               "path": ["api", "{{apiVersion}}", "chat", "bookings", "{{bookingId}}", "read"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "12. Reviews, Ratings & Reputation",
+      "item": [
+        {
+          "name": "Submit Customer Review (Completed & Paid)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bookingId\": \"{{bookingId}}\",\n  \"rating\": 5,\n  \"categories\": {\n    \"punctuality\": 5,\n    \"quality\": 5,\n    \"behavior\": 5,\n    \"costTransparency\": 5\n  },\n  \"comment\": \"Excellent AC servicing! Technician arrived on time and cleaned thoroughly.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "reviews"]
+            }
+          }
+        },
+        {
+          "name": "Provider Reply to Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reply\": \"Thank you for your feedback! Happy to serve you again.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/reviews/{{reviewId}}/reply",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "reviews", "{{reviewId}}", "reply"]
+            }
+          }
+        },
+        {
+          "name": "Get Booking Review",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/reviews/booking/{{bookingId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "reviews", "booking", "{{bookingId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Service Reviews & Breakdown (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/reviews/service/{{serviceId}}?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "reviews", "service", "{{serviceId}}"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Provider Reviews & Breakdown (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/reviews/provider/{{providerId}}?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "reviews", "provider", "{{providerId}}"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Moderate Review Status (Admin/Support)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"FLAGGED\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/reviews/{{reviewId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "reviews", "{{reviewId}}", "status"]
             }
           }
         }

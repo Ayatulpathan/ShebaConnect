@@ -11,6 +11,7 @@ import {
   confirmCashPayment,
   disputeCashPayment,
   fetchBookingReceipt,
+  fetchBookingReview,
 } from '../services/api.js';
 import type {
   Booking,
@@ -18,8 +19,11 @@ import type {
   Quote,
   CashPayment,
   CashReceipt,
+  Review,
 } from '../types/index.js';
 import { BookingChatDrawer } from './BookingChatDrawer.js';
+import { ReviewModal } from './ReviewModal.js';
+import { ReviewDisplayCard } from './ReviewDisplayCard.js';
 import {
   X,
   Clock,
@@ -32,6 +36,7 @@ import {
   Receipt,
   Banknote,
   MessageSquare,
+  Star,
 } from 'lucide-react';
 
 interface Props {
@@ -64,6 +69,8 @@ export const BookingTrackerModal: React.FC<Props> = ({
   const [receipt, setReceipt] = useState<CashReceipt | null>(null);
   const [showReceiptModal, setShowReceiptModal] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
+  const [bookingReview, setBookingReview] = useState<Review | null>(null);
+  const [showReviewModal, setShowReviewModal] = useState(false);
   const [cashAmountInput, setCashAmountInput] = useState<number>(0);
   const [cashNotesInput, setCashNotesInput] = useState<string>('');
 
@@ -110,6 +117,10 @@ export const BookingTrackerModal: React.FC<Props> = ({
           setCashAmountInput(res.payment.amountExpected || selectedBooking.finalPrice || selectedBooking.basePrice);
         })
         .catch(() => setPayment(null));
+
+      fetchBookingReview(selectedBooking._id)
+        .then((rev) => setBookingReview(rev))
+        .catch(() => setBookingReview(null));
     }
   }, [selectedBooking]);
 
@@ -731,6 +742,60 @@ export const BookingTrackerModal: React.FC<Props> = ({
                     </div>
                   )}
 
+                  {/* Phase 8: Reviews & Rating Section */}
+                  {selectedBooking.status === 'COMPLETED' && (
+                    <div className="space-y-3 pt-2">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+                          <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                          {language === 'bn' ? 'সার্ভিস রিভিউ ও রেটিং' : 'Service Review & Rating'}
+                        </h4>
+                        {bookingReview && (
+                          <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                            {language === 'bn' ? 'রিভিউ সম্পন্ন' : 'Reviewed'}
+                          </span>
+                        )}
+                      </div>
+
+                      {bookingReview ? (
+                        <ReviewDisplayCard
+                          review={bookingReview}
+                          onReplyUpdated={(updated) => setBookingReview(updated)}
+                        />
+                      ) : (
+                        <div className="p-4 rounded-2xl border border-amber-200/80 bg-amber-50/40 flex flex-wrap items-center justify-between gap-3">
+                          <div>
+                            <p className="text-xs font-bold text-gray-800">
+                              {language === 'bn'
+                                ? 'আপনার সেবা গ্রহণের অভিজ্ঞতা কেমন ছিল?'
+                                : 'How was your service experience?'}
+                            </p>
+                            <p className="text-[11px] text-gray-500 mt-0.5">
+                              {selectedBooking.isPaid
+                                ? (language === 'bn'
+                                    ? 'টেকনিশিয়ানের কাজের মান ও সেবার মূল্যায়ন জানাতে রিভিউ দিন।'
+                                    : 'Share your feedback and rate the technician to help improve quality.')
+                                : (language === 'bn'
+                                    ? 'ক্যাশ পেমেন্ট নিশ্চিত করার পর রিভিউ দেওয়া যাবে।'
+                                    : 'Review can be submitted once cash payment is confirmed.')}
+                            </p>
+                          </div>
+
+                          {isCustomer && selectedBooking.isPaid && (
+                            <button
+                              type="button"
+                              onClick={() => setShowReviewModal(true)}
+                              className="px-4 py-2 bg-amber-500 hover:bg-amber-600 active:scale-95 text-white rounded-xl text-xs font-bold shadow-sm transition flex items-center gap-1.5"
+                            >
+                              <Star className="w-3.5 h-3.5 fill-white" />
+                              {language === 'bn' ? 'রিভিউ দিন' : 'Rate & Review Service'}
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {/* Role Actions */}
                   <div className="border-t border-gray-100 pt-4 flex flex-wrap items-center justify-between gap-3">
                     {/* Customer Cancel Option */}
@@ -923,6 +988,28 @@ export const BookingTrackerModal: React.FC<Props> = ({
               ? selectedBooking.provider?.name || 'Assigned Provider'
               : selectedBooking.serviceAddress?.contactName || 'Customer'
           }
+        />
+      )}
+
+      {/* Phase 8: Review Modal */}
+      {selectedBooking && (
+        <ReviewModal
+          isOpen={showReviewModal}
+          bookingId={selectedBooking._id}
+          serviceTitle={
+            language === 'bn'
+              ? selectedBooking.service?.name?.bn || 'সার্ভিস'
+              : selectedBooking.service?.name?.en || 'Service'
+          }
+          onClose={() => setShowReviewModal(false)}
+          onReviewSubmitted={(newReview) => {
+            setBookingReview(newReview);
+            setSuccessMsg(
+              language === 'bn'
+                ? 'রিভিউ সফলভাবে সংরক্ষিত হয়েছে'
+                : 'Review submitted successfully'
+            );
+          }}
         />
       )}
     </>

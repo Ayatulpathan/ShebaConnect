@@ -19,6 +19,9 @@ import type {
   CashReceipt,
   Notification,
   ChatMessage,
+  Review,
+  CreateReviewDTO,
+  ServiceReviewsResponse,
 } from '../types/index.js';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
@@ -510,5 +513,72 @@ export const markBookingMessagesAsRead = async (
   }>(`/chat/bookings/${bookingId}/read`);
   return response.data.data.modifiedCount;
 };
+
+// ==================== Phase 8: Reviews & Ratings ====================
+
+export const createReview = async (data: CreateReviewDTO): Promise<Review> => {
+  const response = await apiClient.post<{
+    success: boolean;
+    data: { review: Review };
+  }>('/reviews', data);
+  return response.data.data.review;
+};
+
+export const replyToReview = async (
+  reviewId: string,
+  reply: string
+): Promise<Review> => {
+  const response = await apiClient.post<{
+    success: boolean;
+    data: { review: Review };
+  }>(`/reviews/${reviewId}/reply`, { reply });
+  return response.data.data.review;
+};
+
+export const fetchBookingReview = async (
+  bookingId: string
+): Promise<Review | null> => {
+  const response = await apiClient.get<{
+    success: boolean;
+    data: { review: Review | null };
+  }>(`/reviews/booking/${bookingId}`);
+  return response.data.data.review;
+};
+
+export const fetchServiceReviews = async (
+  serviceId: string,
+  page = 1,
+  limit = 10
+): Promise<ServiceReviewsResponse> => {
+  const response = await apiClient.get<{
+    success: boolean;
+    data: ServiceReviewsResponse;
+  }>(`/reviews/service/${serviceId}`, { params: { page, limit } });
+  return response.data.data;
+};
+
+export const fetchProviderReviews = async (
+  providerId: string,
+  page = 1,
+  limit = 10
+): Promise<ServiceReviewsResponse> => {
+  const response = await apiClient.get<{
+    success: boolean;
+    data: ServiceReviewsResponse;
+  }>(`/reviews/provider/${providerId}`, { params: { page, limit } });
+  return response.data.data;
+};
+
+export const updateReviewStatus = async (
+  reviewId: string,
+  status: 'ACTIVE' | 'FLAGGED' | 'HIDDEN'
+): Promise<Review> => {
+  const response = await apiClient.patch<{
+    success: boolean;
+    data: { review: Review };
+  }>(`/reviews/${reviewId}/status`, { status });
+  return response.data.data.review;
+};
+
 
 

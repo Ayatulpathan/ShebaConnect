@@ -405,4 +405,62 @@ export interface ChatMessage {
   updatedAt: string;
 }
 
+export interface ReviewCategories {
+  punctuality: number;
+  quality: number;
+  behavior: number;
+  costTransparency: number;
+}
+
+export interface Review {
+  _id: string;
+  id?: string;
+  booking: string | Booking | any;
+  customer: User | any;
+  provider?: User | any;
+  organization?: Organization | any;
+  technician?: User | any;
+  service: Service | any;
+  rating: number;
+  categories: ReviewCategories;
+  comment: string;
+  providerReply?: string;
+  repliedAt?: string;
+  repliedBy?: User | any;
+  isPublic: boolean;
+  status: 'ACTIVE' | 'FLAGGED' | 'HIDDEN';
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateReviewDTO {
+  bookingId: string;
+  rating: number;
+  categories: ReviewCategories;
+  comment: string;
+}
+
+export interface ReviewBreakdown {
+  5: number;
+  4: number;
+  3: number;
+  2: number;
+  1: number;
+}
+
+export interface ServiceReviewsResponse {
+  reviews: Review[];
+  summary: {
+    averageRating: number;
+    totalReviews: number;
+    breakdown: ReviewBreakdown;
+  };
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
 

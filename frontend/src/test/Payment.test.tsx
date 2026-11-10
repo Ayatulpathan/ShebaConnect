@@ -109,6 +109,7 @@ vi.mock('../services/api.js', () => ({
   recordCashCollection: vi.fn().mockResolvedValue(mockPayment),
   disputeCashPayment: vi.fn().mockResolvedValue({ ...mockPayment, status: 'DISPUTED' }),
   fetchBookingReceipt: vi.fn().mockResolvedValue(mockReceipt),
+  fetchBookingReview: vi.fn().mockResolvedValue(null),
   transitionBookingStatus: vi.fn().mockResolvedValue({}),
   respondToQuote: vi.fn().mockResolvedValue({}),
 }));
