@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { User, UserRole } from '../types/index.js';
 import { apiClient, setApiAccessToken } from '../services/api.js';
+import { initSocket, disconnectSocket } from '../services/socket.js';
 
 interface RegisterData {
   name: string;
@@ -36,6 +37,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const savedToken = localStorage.getItem('shebaconnect_token');
       if (savedToken) {
         setApiAccessToken(savedToken);
+        initSocket(savedToken);
         try {
           const res = await apiClient.get<{ success: boolean; data: { user: User } }>('/auth/me');
           setUser(res.data.data.user);
@@ -43,6 +45,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           // Token expired or invalid, clear state
           setAccessToken(null);
           setApiAccessToken(null);
+          disconnectSocket();
           localStorage.removeItem('shebaconnect_token');
           setUser(null);
         }
@@ -60,6 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(userData);
     setAccessToken(token);
     setApiAccessToken(token);
+    initSocket(token);
     localStorage.setItem('shebaconnect_token', token);
   };
 
@@ -70,6 +74,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(userData);
     setAccessToken(token);
     setApiAccessToken(token);
+    initSocket(token);
     localStorage.setItem('shebaconnect_token', token);
   };
 
@@ -82,6 +87,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(null);
       setAccessToken(null);
       setApiAccessToken(null);
+      disconnectSocket();
       localStorage.removeItem('shebaconnect_token');
     }
   };

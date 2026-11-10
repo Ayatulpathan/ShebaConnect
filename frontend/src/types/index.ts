@@ -360,3 +360,49 @@ export interface CashReceipt {
   };
 }
 
+export type NotificationType =
+  | 'BOOKING_STATUS_CHANGED'
+  | 'NEW_QUOTE'
+  | 'QUOTE_ACCEPTED'
+  | 'QUOTE_REJECTED'
+  | 'PAYMENT_COLLECTED'
+  | 'PAYMENT_CONFIRMED'
+  | 'PAYMENT_DISPUTED'
+  | 'NEW_CHAT_MESSAGE'
+  | 'SYSTEM_ALERT';
+
+export interface Notification {
+  _id: string;
+  id?: string;
+  recipient: string;
+  sender?: User | any;
+  booking?: Booking | any;
+  title: {
+    en: string;
+    bn: string;
+  };
+  message: {
+    en: string;
+    bn: string;
+  };
+  type: NotificationType;
+  isRead: boolean;
+  readAt?: string;
+  link?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ChatMessage {
+  _id: string;
+  id?: string;
+  booking: string;
+  sender: User | any;
+  senderRole: string;
+  content: string;
+  readBy: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+

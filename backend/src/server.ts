@@ -1,34 +1,17 @@
 import http from 'http';
-import { Server as SocketIOServer } from 'socket.io';
 import { createApp } from './app.js';
 import { env } from './config/env.js';
 import { logger } from './config/logger.js';
 import { connectDatabase, disconnectDatabase } from './config/db.js';
+import { SocketService } from './services/socket.service.js';
 
 const startServer = async () => {
   try {
     const app = createApp();
     const server = http.createServer(app);
 
-    // Initialize Socket.IO with CORS
-    const io = new SocketIOServer(server, {
-      cors: {
-        origin: [env.CLIENT_URL, 'http://localhost:5173'],
-        methods: ['GET', 'POST'],
-        credentials: true,
-      },
-      pingTimeout: 30000,
-      pingInterval: 25000,
-    });
-
-    // Basic socket connection listener for Phase 1
-    io.on('connection', (socket) => {
-      logger.debug({ socketId: socket.id }, 'Socket client connected');
-
-      socket.on('disconnect', (reason) => {
-        logger.debug({ socketId: socket.id, reason }, 'Socket client disconnected');
-      });
-    });
+    // Initialize authenticated Socket.IO Service
+    SocketService.init(server);
 
     // Connect to database (non-blocking for initial local tests if DB is down)
     try {

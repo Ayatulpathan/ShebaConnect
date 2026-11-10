@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext.js';
 import { HealthStatusBadge } from './HealthStatusBadge.js';
 import { UserMenu } from './UserMenu.js';
+import { NotificationBell } from './NotificationBell.js';
 import { Globe, Menu, X, Wrench } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
@@ -57,12 +58,16 @@ export const Navbar: React.FC = () => {
               <span>{language === 'bn' ? 'English' : 'বাংলা'}</span>
             </button>
 
+            {/* In-App Notifications */}
+            <NotificationBell />
+
             {/* Auth / User Menu */}
             <UserMenu />
           </div>
 
           {/* Mobile Menu Button */}
           <div className="flex sm:hidden items-center gap-2">
+            <NotificationBell />
             <button
               onClick={toggleLanguage}
               className="px-2 py-1 text-xs font-bold rounded border border-gray-300 text-gray-700"

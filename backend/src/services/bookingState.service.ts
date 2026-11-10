@@ -7,6 +7,8 @@ import { Organization } from '../models/Organization.js';
 import { BOOKING_STATUSES, BookingStatus } from '../constants/statuses.js';
 import { UserRole } from '../constants/roles.js';
 import { AppError } from '../utils/AppError.js';
+import { SocketService } from './socket.service.js';
+import { NotificationService } from './notification.service.js';
 
 export interface TransitionActor {
   userId: string;
@@ -93,6 +95,47 @@ export class BookingStateService {
       reason: options.reason,
       metadata: options.metadata || {},
     });
+
+    // 6. Broadcast real-time booking update & push notification
+    try {
+      const participantIds: string[] = [];
+      if (booking.customer) participantIds.push(booking.customer.toString());
+      if (booking.provider) participantIds.push(booking.provider.toString());
+      if (booking.technician) participantIds.push(booking.technician.toString());
+
+      SocketService.broadcastBookingStatusUpdate(
+        booking._id.toString(),
+        nextStatus,
+        booking.bookingNumber,
+        participantIds
+      );
+
+      // Notify the other party
+      const isCustomerActor = actor.userId === booking.customer.toString();
+      const targetRecipient = isCustomerActor
+        ? booking.provider?.toString() || booking.technician?.toString()
+        : booking.customer.toString();
+
+      if (targetRecipient) {
+        await NotificationService.createNotification({
+          recipient: targetRecipient,
+          sender: actor.userId,
+          booking: booking._id.toString(),
+          type: 'BOOKING_STATUS_CHANGED',
+          title: {
+            en: `Booking Status: ${nextStatus.replace(/_/g, ' ')}`,
+            bn: `বুকিং স্ট্যাটাস: ${nextStatus}`,
+          },
+          message: {
+            en: `Booking #${booking.bookingNumber} is now ${nextStatus.replace(/_/g, ' ')}`,
+            bn: `আপনার বুকিং #${booking.bookingNumber}-এর অবস্থা পরিবর্তিত হয়ে '${nextStatus}' হয়েছে`,
+          },
+          link: booking._id.toString(),
+        });
+      }
+    } catch (_err) {
+      // Non-blocking notification dispatch
+    }
 
     return booking;
   }

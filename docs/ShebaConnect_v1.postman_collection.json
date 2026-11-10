@@ -60,6 +60,11 @@
       "key": "entryId",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "notificationId",
+      "value": "",
+      "type": "string"
     }
   ],
   "item": [
@@ -771,6 +776,118 @@
               "raw": "{{baseUrl}}/api/{{apiVersion}}/payments/admin/report",
               "host": ["{{baseUrl}}"],
               "path": ["api", "{{apiVersion}}", "payments", "admin", "report"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "11. Real-Time Communication & Notifications (Phase 7)",
+      "item": [
+        {
+          "name": "Get User Notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/notifications?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "notifications"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Unread Notification Count",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/notifications/unread-count",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "notifications", "unread-count"]
+            }
+          }
+        },
+        {
+          "name": "Mark Single Notification Read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/notifications/{{notificationId}}/read",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "notifications", "{{notificationId}}", "read"]
+            }
+          }
+        },
+        {
+          "name": "Mark All Notifications Read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/notifications/read-all",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "notifications", "read-all"]
+            }
+          }
+        },
+        {
+          "name": "Get Booking Chat Message History",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/chat/bookings/{{bookingId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "chat", "bookings", "{{bookingId}}"]
+            }
+          }
+        },
+        {
+          "name": "Send Booking Chat Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Hello, please confirm the service arrival time.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/chat/bookings/{{bookingId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "chat", "bookings", "{{bookingId}}"]
+            }
+          }
+        },
+        {
+          "name": "Mark Booking Chat Messages Read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/chat/bookings/{{bookingId}}/read",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "chat", "bookings", "{{bookingId}}", "read"]
             }
           }
         }

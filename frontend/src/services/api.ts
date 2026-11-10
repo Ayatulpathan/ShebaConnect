@@ -17,6 +17,8 @@ import type {
   CommissionSettlement,
   ProviderEarningsSummary,
   CashReceipt,
+  Notification,
+  ChatMessage,
 } from '../types/index.js';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
@@ -424,4 +426,89 @@ export const fetchAdminFinancialReport = async (): Promise<any> => {
   );
   return response.data.data;
 };
+
+// --- Phase 7: Real-Time Communication & Notifications ---
+
+export const fetchNotifications = async (params?: {
+  isRead?: boolean;
+  page?: number;
+  limit?: number;
+}): Promise<{
+  notifications: Notification[];
+  total: number;
+  unreadCount: number;
+  page: number;
+  limit: number;
+}> => {
+  const response = await apiClient.get<{
+    success: boolean;
+    data: {
+      notifications: Notification[];
+      total: number;
+      unreadCount: number;
+      page: number;
+      limit: number;
+    };
+  }>('/notifications', { params });
+  return response.data.data;
+};
+
+export const fetchUnreadNotificationCount = async (): Promise<number> => {
+  const response = await apiClient.get<{
+    success: boolean;
+    data: { unreadCount: number };
+  }>('/notifications/unread-count');
+  return response.data.data.unreadCount;
+};
+
+export const markNotificationAsRead = async (
+  notificationId: string
+): Promise<Notification> => {
+  const response = await apiClient.patch<{
+    success: boolean;
+    data: { notification: Notification };
+  }>(`/notifications/${notificationId}/read`);
+  return response.data.data.notification;
+};
+
+export const markAllNotificationsAsRead = async (): Promise<number> => {
+  const response = await apiClient.patch<{
+    success: boolean;
+    data: { modifiedCount: number };
+  }>('/notifications/read-all');
+  return response.data.data.modifiedCount;
+};
+
+export const fetchBookingMessages = async (
+  bookingId: string,
+  limit?: number
+): Promise<ChatMessage[]> => {
+  const response = await apiClient.get<{
+    success: boolean;
+    data: { messages: ChatMessage[] };
+  }>(`/chat/bookings/${bookingId}`, { params: { limit } });
+  return response.data.data.messages;
+};
+
+export const sendBookingMessage = async (
+  bookingId: string,
+  content: string
+): Promise<ChatMessage> => {
+  const response = await apiClient.post<{
+    success: boolean;
+    data: { message: ChatMessage };
+  }>(`/chat/bookings/${bookingId}`, { content });
+  return response.data.data.message;
+};
+
+export const markBookingMessagesAsRead = async (
+  bookingId: string
+): Promise<number> => {
+  const response = await apiClient.patch<{
+    success: boolean;
+    data: { modifiedCount: number };
+  }>(`/chat/bookings/${bookingId}/read`);
+  return response.data.data.modifiedCount;
+};
+
 

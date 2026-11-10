@@ -19,6 +19,7 @@ import type {
   CashPayment,
   CashReceipt,
 } from '../types/index.js';
+import { BookingChatDrawer } from './BookingChatDrawer.js';
 import {
   X,
   Clock,
@@ -30,6 +31,7 @@ import {
   RefreshCw,
   Receipt,
   Banknote,
+  MessageSquare,
 } from 'lucide-react';
 
 interface Props {
@@ -61,6 +63,7 @@ export const BookingTrackerModal: React.FC<Props> = ({
   const [payment, setPayment] = useState<CashPayment | null>(null);
   const [receipt, setReceipt] = useState<CashReceipt | null>(null);
   const [showReceiptModal, setShowReceiptModal] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
   const [cashAmountInput, setCashAmountInput] = useState<number>(0);
   const [cashNotesInput, setCashNotesInput] = useState<string>('');
 
@@ -443,6 +446,15 @@ export const BookingTrackerModal: React.FC<Props> = ({
                     </div>
 
                     <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setChatOpen(true)}
+                        className="px-3 py-1 bg-brand-50 hover:bg-brand-100 text-brand-700 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors border border-brand-200 shadow-sm"
+                      >
+                        <MessageSquare className="w-3.5 h-3.5" />
+                        <span>{language === 'bn' ? 'সরাসরি চ্যাট' : 'Live Chat'}</span>
+                      </button>
+
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-bold ${
                           selectedBooking.status === 'COMPLETED'
@@ -897,6 +909,21 @@ export const BookingTrackerModal: React.FC<Props> = ({
             </div>
           </div>
         </div>
+      )}
+
+      {/* Real-time Booking Chat Drawer */}
+      {selectedBooking && (
+        <BookingChatDrawer
+          isOpen={chatOpen}
+          onClose={() => setChatOpen(false)}
+          bookingId={selectedBooking._id}
+          bookingNumber={selectedBooking.bookingNumber}
+          partnerName={
+            isCustomer
+              ? selectedBooking.provider?.name || 'Assigned Provider'
+              : selectedBooking.serviceAddress?.contactName || 'Customer'
+          }
+        />
       )}
     </>
   );
