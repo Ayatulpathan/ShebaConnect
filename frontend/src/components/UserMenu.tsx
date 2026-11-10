@@ -5,6 +5,7 @@ import { AuthModal } from './AuthModal.js';
 import { ProviderOperationsModal } from './ProviderOperationsModal.js';
 import { CompanyOperationsModal } from './CompanyOperationsModal.js';
 import { BookingTrackerModal } from './BookingTrackerModal.js';
+import { ProviderEarningsModal } from './ProviderEarningsModal.js';
 import {
   User,
   LogOut,
@@ -14,6 +15,7 @@ import {
   Wrench,
   Building2,
   CalendarCheck,
+  Wallet,
 } from 'lucide-react';
 
 export const UserMenu: React.FC = () => {
@@ -24,6 +26,7 @@ export const UserMenu: React.FC = () => {
   const [providerModalOpen, setProviderModalOpen] = useState(false);
   const [companyModalOpen, setCompanyModalOpen] = useState(false);
   const [trackerModalOpen, setTrackerModalOpen] = useState(false);
+  const [earningsModalOpen, setEarningsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'login' | 'register'>('login');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -175,6 +178,21 @@ export const UserMenu: React.FC = () => {
               </button>
             )}
 
+            {['INDIVIDUAL_PROVIDER', 'COMPANY_OWNER', 'TECHNICIAN', 'ADMIN'].includes(
+              user.role
+            ) && (
+              <button
+                onClick={() => {
+                  setDropdownOpen(false);
+                  setEarningsModalOpen(true);
+                }}
+                className="w-full flex items-center gap-2.5 px-4 py-2 hover:bg-emerald-50 text-left text-emerald-800 font-semibold"
+              >
+                <Wallet className="w-4 h-4 text-emerald-600" />
+                <span>{language === 'bn' ? 'আয় ও কমিশন লেজার' : 'Earnings & Commission'}</span>
+              </button>
+            )}
+
             {user.role === 'ADMIN' && (
               <button
                 onClick={() => setDropdownOpen(false)}
@@ -213,6 +231,10 @@ export const UserMenu: React.FC = () => {
       <BookingTrackerModal
         isOpen={trackerModalOpen}
         onClose={() => setTrackerModalOpen(false)}
+      />
+      <ProviderEarningsModal
+        isOpen={earningsModalOpen}
+        onClose={() => setEarningsModalOpen(false)}
       />
     </div>
   );

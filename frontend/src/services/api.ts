@@ -12,6 +12,11 @@ import type {
   BookingAddress,
   Quote,
   BookingStatusHistory,
+  CashPayment,
+  CommissionEntry,
+  CommissionSettlement,
+  ProviderEarningsSummary,
+  CashReceipt,
 } from '../types/index.js';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
@@ -324,3 +329,99 @@ export const respondToQuote = async (
   }>(`/bookings/quotes/${quoteId}/respond`, { action });
   return response.data.data;
 };
+
+// --- Phase 6: Cash Payment & Commission Engine ---
+
+export const fetchBookingPayment = async (
+  bookingId: string
+): Promise<{
+  payment: CashPayment;
+  commissionEntry?: CommissionEntry | null;
+  booking: Booking;
+}> => {
+  const response = await apiClient.get<{
+    success: boolean;
+    data: {
+      payment: CashPayment;
+      commissionEntry?: CommissionEntry | null;
+      booking: Booking;
+    };
+  }>(`/payments/bookings/${bookingId}`);
+  return response.data.data;
+};
+
+export const recordCashCollection = async (
+  bookingId: string,
+  amountCollected: number,
+  notes?: string
+): Promise<CashPayment> => {
+  const response = await apiClient.post<{
+    success: boolean;
+    data: { payment: CashPayment };
+  }>(`/payments/bookings/${bookingId}/collect`, { amountCollected, notes });
+  return response.data.data.payment;
+};
+
+export const confirmCashPayment = async (
+  bookingId: string,
+  notes?: string
+): Promise<{ payment: CashPayment; commissionEntry: CommissionEntry }> => {
+  const response = await apiClient.post<{
+    success: boolean;
+    data: { payment: CashPayment; commissionEntry: CommissionEntry };
+  }>(`/payments/bookings/${bookingId}/confirm`, { notes });
+  return response.data.data;
+};
+
+export const disputeCashPayment = async (
+  bookingId: string,
+  reason: string
+): Promise<CashPayment> => {
+  const response = await apiClient.post<{
+    success: boolean;
+    data: { payment: CashPayment };
+  }>(`/payments/bookings/${bookingId}/dispute`, { reason });
+  return response.data.data.payment;
+};
+
+export const fetchBookingReceipt = async (
+  bookingId: string
+): Promise<CashReceipt> => {
+  const response = await apiClient.get<{
+    success: boolean;
+    data: { receipt: CashReceipt };
+  }>(`/payments/bookings/${bookingId}/receipt`);
+  return response.data.data.receipt;
+};
+
+export const fetchProviderEarningsSummary = async (): Promise<ProviderEarningsSummary> => {
+  const response = await apiClient.get<{
+    success: boolean;
+    data: ProviderEarningsSummary;
+  }>('/payments/provider/summary');
+  return response.data.data;
+};
+
+export const recordCommissionSettlement = async (data: {
+  providerId?: string;
+  organizationId?: string;
+  entryIds: string[];
+  amountSettled: number;
+  settlementMethod?: string;
+  paymentReference?: string;
+  notes?: string;
+}): Promise<{ settlement: CommissionSettlement; settledCount: number }> => {
+  const response = await apiClient.post<{
+    success: boolean;
+    data: { settlement: CommissionSettlement; settledCount: number };
+  }>('/payments/admin/settle', data);
+  return response.data.data;
+};
+
+export const fetchAdminFinancialReport = async (): Promise<any> => {
+  const response = await apiClient.get<{ success: boolean; data: any }>(
+    '/payments/admin/report'
+  );
+  return response.data.data;
+};
+

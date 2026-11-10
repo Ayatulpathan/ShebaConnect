@@ -55,6 +55,11 @@
       "key": "quoteId",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "entryId",
+      "value": "",
+      "type": "string"
     }
   ],
   "item": [
@@ -629,6 +634,143 @@
               "raw": "{{baseUrl}}/api/{{apiVersion}}/bookings/quotes/{{quoteId}}/respond",
               "host": ["{{baseUrl}}"],
               "path": ["api", "{{apiVersion}}", "bookings", "quotes", "{{quoteId}}", "respond"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "10. Cash Payment & Commission Engine (Phase 6)",
+      "item": [
+        {
+          "name": "Record Cash Collection (Provider/Technician)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amountCollected\": 1200,\n  \"notes\": \"Received 1200 BDT in cash from customer upon job completion\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/payments/bookings/{{bookingId}}/collect",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "payments", "bookings", "{{bookingId}}", "collect"]
+            }
+          }
+        },
+        {
+          "name": "Confirm Cash Handover (Customer)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"notes\": \"Handed cash to technician in full after inspection\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/payments/bookings/{{bookingId}}/confirm",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "payments", "bookings", "{{bookingId}}", "confirm"]
+            }
+          }
+        },
+        {
+          "name": "Dispute Cash Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Provider demanded 500 BDT extra cash beyond agreed quotation\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/payments/bookings/{{bookingId}}/dispute",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "payments", "bookings", "{{bookingId}}", "dispute"]
+            }
+          }
+        },
+        {
+          "name": "Get Booking Payment Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/payments/bookings/{{bookingId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "payments", "bookings", "{{bookingId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Structured Cash Receipt",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/payments/bookings/{{bookingId}}/receipt",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "payments", "bookings", "{{bookingId}}", "receipt"]
+            }
+          }
+        },
+        {
+          "name": "Provider Earnings & Commission Ledger Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/payments/provider/summary",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "payments", "provider", "summary"]
+            }
+          }
+        },
+        {
+          "name": "Record Admin Commission Settlement",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"providerId\": \"{{providerId}}\",\n  \"entryIds\": [\"{{entryId}}\"],\n  \"amountSettled\": 120,\n  \"settlementMethod\": \"MANUAL_CASH_OR_OFFLINE\",\n  \"paymentReference\": \"VOUCHER-DHAKA-2611\",\n  \"notes\": \"Received 120 BDT cash at regional support desk\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/payments/admin/settle",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "payments", "admin", "settle"]
+            }
+          }
+        },
+        {
+          "name": "Admin Platform Financial Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/payments/admin/report",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "payments", "admin", "report"]
             }
           }
         }

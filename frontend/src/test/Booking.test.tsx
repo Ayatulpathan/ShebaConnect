@@ -75,6 +75,19 @@ vi.mock('../services/api.js', () => ({
   fetchQuotes: vi.fn().mockResolvedValue([]),
   transitionBookingStatus: vi.fn().mockResolvedValue({}),
   respondToQuote: vi.fn().mockResolvedValue({}),
+  fetchBookingPayment: vi.fn().mockResolvedValue({
+    payment: {
+      _id: 'pay-1',
+      booking: 'bk-123',
+      amountExpected: 1200,
+      amountCollected: 0,
+      status: 'PENDING',
+    },
+  }),
+  recordCashCollection: vi.fn().mockResolvedValue({}),
+  confirmCashPayment: vi.fn().mockResolvedValue({}),
+  disputeCashPayment: vi.fn().mockResolvedValue({}),
+  fetchBookingReceipt: vi.fn().mockResolvedValue({}),
 }));
 
 // Mock useAuth

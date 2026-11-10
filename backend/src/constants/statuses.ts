@@ -36,3 +36,25 @@ export const QUOTE_STATUSES = {
 export type QuoteStatus = (typeof QUOTE_STATUSES)[keyof typeof QUOTE_STATUSES];
 export const ALL_QUOTE_STATUSES: QuoteStatus[] = Object.values(QUOTE_STATUSES);
 
+export const PAYMENT_STATUSES = {
+  PENDING: 'PENDING',
+  COLLECTED_BY_PROVIDER: 'COLLECTED_BY_PROVIDER',
+  CONFIRMED: 'CONFIRMED',
+  DISPUTED: 'DISPUTED',
+} as const;
+
+export type PaymentStatus = (typeof PAYMENT_STATUSES)[keyof typeof PAYMENT_STATUSES];
+export const ALL_PAYMENT_STATUSES: PaymentStatus[] = Object.values(PAYMENT_STATUSES);
+
+export const COMMISSION_STATUSES = {
+  PENDING_SETTLEMENT: 'PENDING_SETTLEMENT',
+  SETTLED: 'SETTLED',
+  WAIVED: 'WAIVED',
+} as const;
+
+export type CommissionStatus = (typeof COMMISSION_STATUSES)[keyof typeof COMMISSION_STATUSES];
+export const ALL_COMMISSION_STATUSES: CommissionStatus[] = Object.values(COMMISSION_STATUSES);
+
+export const DEFAULT_COMMISSION_RATE = 0.1; // 10% Platform fee (strictly zero-cost architecture ledger)
+
+

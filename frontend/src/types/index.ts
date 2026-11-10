@@ -251,3 +251,112 @@ export interface BookingStatusHistory {
   reason?: string;
   createdAt: string;
 }
+
+export type PaymentStatus =
+  | 'PENDING'
+  | 'COLLECTED_BY_PROVIDER'
+  | 'CONFIRMED'
+  | 'DISPUTED';
+
+export type CommissionStatus =
+  | 'PENDING_SETTLEMENT'
+  | 'SETTLED'
+  | 'WAIVED';
+
+export interface CashPayment {
+  _id: string;
+  id?: string;
+  booking: string;
+  receiptNumber: string;
+  customer: User | any;
+  provider: User | any;
+  organization?: Organization | any;
+  amountExpected: number;
+  amountCollected: number;
+  status: PaymentStatus;
+  collectedAt?: string;
+  confirmedAt?: string;
+  paymentMethod: string;
+  notes?: string;
+  disputeReason?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CommissionEntry {
+  _id: string;
+  id?: string;
+  booking: Booking | string | any;
+  payment: string;
+  provider: User | string | any;
+  organization?: Organization | string | any;
+  totalAmount: number;
+  commissionRate: number;
+  commissionAmount: number;
+  providerEarnings: number;
+  status: CommissionStatus;
+  settlement?: string;
+  settledAt?: string;
+  waiverReason?: string;
+  createdAt: string;
+}
+
+export interface CommissionSettlement {
+  _id: string;
+  id?: string;
+  settlementNumber: string;
+  provider?: User | string | any;
+  organization?: Organization | string | any;
+  amountSettled: number;
+  entriesSettled: string[] | CommissionEntry[];
+  settlementMethod: string;
+  paymentReference?: string;
+  recordedBy: User | string | any;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface ProviderEarningsSummary {
+  totalBookings: number;
+  totalGrossRevenue: number;
+  totalPlatformCommission: number;
+  totalNetEarnings: number;
+  pendingCommissionDue: number;
+  settledCommission: number;
+  commissionRate: number;
+  recentEntries: CommissionEntry[];
+  recentSettlements: CommissionSettlement[];
+}
+
+export interface CashReceipt {
+  receiptNumber: string;
+  bookingNumber: string;
+  status: string;
+  paymentMethod: string;
+  amountExpected: number;
+  amountCollected: number;
+  currency: string;
+  currencySymbol: string;
+  collectedAt?: string;
+  confirmedAt?: string;
+  customer: {
+    name: string;
+    phone: string;
+  };
+  provider: {
+    name: string;
+    phone: string;
+  };
+  service: {
+    name: {
+      en: string;
+      bn: string;
+    };
+    category: string;
+  };
+  serviceAddress: {
+    area: string;
+    addressLine: string;
+  };
+}
+
