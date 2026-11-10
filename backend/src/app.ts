@@ -29,7 +29,13 @@ export const createApp = (): express.Application => {
         if (!origin) return callback(null, true);
 
         const allowedOrigins = [env.CLIENT_URL, 'http://localhost:5173', 'http://127.0.0.1:5173'];
-        if (allowedOrigins.includes(origin) || env.NODE_ENV === 'development') {
+        if (
+          allowedOrigins.includes(origin) ||
+          env.NODE_ENV === 'development' ||
+          origin.endsWith('.pages.dev') ||
+          origin.endsWith('.onrender.com') ||
+          origin.endsWith('.vercel.app')
+        ) {
           return callback(null, true);
         }
         return callback(new Error('CORS policy blocked this request origin'));

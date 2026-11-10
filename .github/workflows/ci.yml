@@ -1,0 +1,58 @@
+name: ShebaConnect CI & Build Verification
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  backend-test-and-build:
+    name: Backend CI (Tests & Compilation)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: backend/package.json
+
+      - name: Install Backend Dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Run Backend Vitest Suite
+        working-directory: backend
+        run: npm test
+
+      - name: Compile Backend TypeScript
+        working-directory: backend
+        run: npm run build
+
+  frontend-test-and-build:
+    name: Frontend CI (Tests & Vite Bundle)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: frontend/package.json
+
+      - name: Install Frontend Dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Run Frontend Vitest Suite
+        working-directory: frontend
+        run: npm test
+
+      - name: Build Frontend Production Bundle
+        working-directory: frontend
+        run: npm run build

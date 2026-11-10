@@ -50,9 +50,6 @@ export const connectDatabase = async (): Promise<typeof mongoose> => {
     return connection;
   } catch (error) {
     logger.error({ error }, '❌ Failed to connect to MongoDB');
-    if (env.NODE_ENV === 'production') {
-      process.exit(1);
-    }
     throw error;
   }
 };

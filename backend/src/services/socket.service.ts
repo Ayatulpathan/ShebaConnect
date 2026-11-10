@@ -30,7 +30,25 @@ export class SocketService {
 
     const io = new SocketIOServer(server, {
       cors: {
-        origin: [env.CLIENT_URL, 'http://localhost:5173', 'http://localhost:3000'],
+        origin: (origin, callback) => {
+          if (!origin) return callback(null, true);
+          const allowedOrigins = [
+            env.CLIENT_URL,
+            'http://localhost:5173',
+            'http://localhost:3000',
+            'http://127.0.0.1:5173',
+          ];
+          if (
+            allowedOrigins.includes(origin) ||
+            env.NODE_ENV === 'development' ||
+            origin.endsWith('.pages.dev') ||
+            origin.endsWith('.onrender.com') ||
+            origin.endsWith('.vercel.app')
+          ) {
+            return callback(null, true);
+          }
+          return callback(new Error('CORS origin blocked by Socket.IO policy'));
+        },
         methods: ['GET', 'POST'],
         credentials: true,
       },
