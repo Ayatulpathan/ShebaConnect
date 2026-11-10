@@ -216,9 +216,9 @@ export class BookingStateService {
       }
 
       case 'PROVIDER_ASSIGNED': {
-        if (actor.role !== 'COMPANY_OWNER' && actor.role !== 'INDIVIDUAL_PROVIDER') {
+        if (actor.role !== 'COMPANY_OWNER' && actor.role !== 'COMPANY_STAFF' && actor.role !== 'INDIVIDUAL_PROVIDER') {
           throw new AppError(
-            'Only company owners or providers can assign a technician',
+            'Only company owners, staff, or providers can assign a technician',
             403,
             'FORBIDDEN_TRANSITION'
           );
@@ -232,19 +232,36 @@ export class BookingStateService {
           );
         }
 
-        // If company owner, verify the technician is a registered member of their company
-        if (actor.role === 'COMPANY_OWNER') {
-          const org = await Organization.findOne({ owner: actor.userId });
-          if (!org) {
-            throw new AppError(
-              'Organization not found for this company owner',
-              404,
-              'ORGANIZATION_NOT_FOUND'
-            );
+        // If company owner or staff, verify the technician is a registered member of their company
+        if (actor.role === 'COMPANY_OWNER' || actor.role === 'COMPANY_STAFF') {
+          let orgId: Types.ObjectId | undefined;
+          if (actor.role === 'COMPANY_OWNER') {
+            const org = await Organization.findOne({ owner: actor.userId });
+            if (!org) {
+              throw new AppError(
+                'Organization not found for this company owner',
+                404,
+                'ORGANIZATION_NOT_FOUND'
+              );
+            }
+            orgId = org._id;
+          } else {
+            const staffMember = await OrganizationMember.findOne({
+              user: actor.userId,
+              status: 'ACTIVE',
+            });
+            if (!staffMember) {
+              throw new AppError(
+                'Staff membership not found for this user',
+                403,
+                'FORBIDDEN_TRANSITION'
+              );
+            }
+            orgId = staffMember.organization;
           }
 
           const isMember = await OrganizationMember.findOne({
-            organization: org._id,
+            organization: orgId,
             user: options.technicianId,
             status: 'ACTIVE',
           });

@@ -58,7 +58,7 @@ export const CompanyOperationsModal: React.FC<Props> = ({ isOpen, onClose }) => 
       const org = await fetchMyCompany();
       if (org) {
         setCompany(org);
-        setBusinessName(org.businessName);
+        setBusinessName(org.businessName || org.name || '');
         setTradeLicenseNumber(org.tradeLicenseNumber || '');
         setContactPhone(org.contactPhone);
         setContactEmail(org.contactEmail || '');
@@ -155,7 +155,7 @@ export const CompanyOperationsModal: React.FC<Props> = ({ isOpen, onClose }) => 
         userId: newMemberUserId.trim(),
         role: newMemberRole,
       });
-      setMembers((prev) => [...prev, added]);
+      setMembers((prev) => [...prev, added.member || added]);
       setNewMemberUserId('');
       setSuccessMsg(
         language === 'bn'

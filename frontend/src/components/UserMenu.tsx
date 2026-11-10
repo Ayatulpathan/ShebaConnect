@@ -3,7 +3,8 @@ import { useAuth } from '../context/AuthContext.js';
 import { useLanguage } from '../context/LanguageContext.js';
 import { AuthModal } from './AuthModal.js';
 import { ProviderOperationsModal } from './ProviderOperationsModal.js';
-import { CompanyOperationsModal } from './CompanyOperationsModal.js';
+import { CompanyDashboardModal } from './CompanyDashboardModal.js';
+import { TechnicianJobsModal } from './TechnicianJobsModal.js';
 import { BookingTrackerModal } from './BookingTrackerModal.js';
 import { ProviderEarningsModal } from './ProviderEarningsModal.js';
 import {
@@ -25,6 +26,7 @@ export const UserMenu: React.FC = () => {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [providerModalOpen, setProviderModalOpen] = useState(false);
   const [companyModalOpen, setCompanyModalOpen] = useState(false);
+  const [techJobsModalOpen, setTechJobsModalOpen] = useState(false);
   const [trackerModalOpen, setTrackerModalOpen] = useState(false);
   const [earningsModalOpen, setEarningsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'login' | 'register'>('login');
@@ -165,7 +167,7 @@ export const UserMenu: React.FC = () => {
               </button>
             )}
 
-            {user.role === 'COMPANY_OWNER' && (
+            {['COMPANY_OWNER', 'COMPANY_STAFF'].includes(user.role) && (
               <button
                 onClick={() => {
                   setDropdownOpen(false);
@@ -174,7 +176,20 @@ export const UserMenu: React.FC = () => {
                 className="w-full flex items-center gap-2.5 px-4 py-2 hover:bg-purple-50 text-left text-purple-700 font-semibold"
               >
                 <Building2 className="w-4 h-4 text-purple-600" />
-                <span>{language === 'bn' ? 'কোম্পানি ম্যানেজমেন্ট' : 'Company Management'}</span>
+                <span>{language === 'bn' ? 'প্রতিষ্ঠান ড্যাশবোর্ড' : 'Company Dashboard'}</span>
+              </button>
+            )}
+
+            {user.role === 'TECHNICIAN' && (
+              <button
+                onClick={() => {
+                  setDropdownOpen(false);
+                  setTechJobsModalOpen(true);
+                }}
+                className="w-full flex items-center gap-2.5 px-4 py-2 hover:bg-blue-50 text-left text-blue-700 font-semibold"
+              >
+                <Wrench className="w-4 h-4 text-blue-600" />
+                <span>{language === 'bn' ? 'আমার কাজসমূহ' : 'My Assigned Jobs'}</span>
               </button>
             )}
 
@@ -224,9 +239,13 @@ export const UserMenu: React.FC = () => {
         isOpen={providerModalOpen}
         onClose={() => setProviderModalOpen(false)}
       />
-      <CompanyOperationsModal
+      <CompanyDashboardModal
         isOpen={companyModalOpen}
         onClose={() => setCompanyModalOpen(false)}
+      />
+      <TechnicianJobsModal
+        isOpen={techJobsModalOpen}
+        onClose={() => setTechJobsModalOpen(false)}
       />
       <BookingTrackerModal
         isOpen={trackerModalOpen}

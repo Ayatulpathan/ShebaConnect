@@ -1,9 +1,37 @@
+import { Types } from 'mongoose';
 import { Organization, type IOrganization } from '../models/Organization.js';
 import { OrganizationMember, type IOrganizationMember, type OrganizationMemberRole } from '../models/OrganizationMember.js';
 import { User, type IUser } from '../models/User.js';
+import { Booking, type IBooking } from '../models/Booking.js';
+import { Review } from '../models/Review.js';
+import { BookingStateService } from './bookingState.service.js';
+import { NotificationService } from './notification.service.js';
 import { AppError } from '../utils/AppError.js';
 import { hashPassword } from '../utils/password.js';
 import { VALID_DHAKA_AREA_IDS } from '../constants/areas.js';
+
+export interface TechnicianStat {
+  technicianId: string;
+  name: string;
+  phone: string;
+  email: string;
+  avatarUrl?: string;
+  assignedJobsCount: number;
+  completedJobsCount: number;
+  ratingAverage: number;
+  ratingCount: number;
+}
+
+export interface CompanyMetrics {
+  totalBookings: number;
+  completedBookings: number;
+  activeBookings: number;
+  cancelledBookings: number;
+  totalGrossRevenue: number;
+  netRevenue: number;
+  platformCommissionDue: number;
+  technicianStats: TechnicianStat[];
+}
 
 interface CreateOrgInput {
   name: string;
@@ -260,5 +288,299 @@ export class CompanyOperationsService {
     }
 
     await member.deleteOne();
+  }
+
+  /**
+   * Update staff or technician role/status
+   */
+  static async updateMember(
+    orgId: string,
+    ownerId: string,
+    memberId: string,
+    data: { memberRole?: OrganizationMemberRole; status?: 'ACTIVE' | 'INACTIVE' }
+  ): Promise<IOrganizationMember> {
+    const org = await Organization.findById(orgId);
+    if (!org) {
+      throw AppError.notFound('Organization not found', 'ORGANIZATION_NOT_FOUND');
+    }
+
+    if (org.owner.toString() !== ownerId) {
+      throw AppError.forbidden(
+        'Only the company owner can modify staff and technicians.',
+        'FORBIDDEN_ORGANIZATION_ACCESS'
+      );
+    }
+
+    const member = await OrganizationMember.findOne({
+      _id: memberId,
+      organization: orgId,
+    });
+
+    if (!member) {
+      throw AppError.notFound('Company member record not found.', 'MEMBER_NOT_FOUND');
+    }
+
+    if (data.memberRole) {
+      member.memberRole = data.memberRole;
+      const newRole = data.memberRole === 'STAFF' ? 'COMPANY_STAFF' : 'TECHNICIAN';
+      await User.findByIdAndUpdate(member.user, { role: newRole });
+    }
+
+    if (data.status) {
+      member.status = data.status;
+    }
+
+    await member.save();
+    return member;
+  }
+
+  /**
+   * Assign a technician to a company booking
+   */
+  static async assignTechnicianToBooking(
+    orgId: string,
+    actorUserId: string,
+    actorRole: string,
+    bookingId: string,
+    technicianId: string
+  ): Promise<IBooking> {
+    const org = await Organization.findById(orgId);
+    if (!org) {
+      throw AppError.notFound('Organization not found', 'ORGANIZATION_NOT_FOUND');
+    }
+
+    const isOwner = org.owner.toString() === actorUserId;
+    const isStaff = await OrganizationMember.exists({
+      organization: orgId,
+      user: actorUserId,
+      memberRole: 'STAFF',
+      status: 'ACTIVE',
+    });
+
+    if (!isOwner && !isStaff && actorRole !== 'ADMIN') {
+      throw AppError.forbidden(
+        'You do not have permission to manage bookings for this company.',
+        'FORBIDDEN_ORGANIZATION_ACCESS'
+      );
+    }
+
+    // Verify technician is active in this company
+    const techMembership = await OrganizationMember.findOne({
+      organization: orgId,
+      user: technicianId,
+      memberRole: 'TECHNICIAN',
+      status: 'ACTIVE',
+    });
+
+    if (!techMembership) {
+      throw AppError.badRequest(
+        'The specified technician is not an active technician in your organization.',
+        'INVALID_TECHNICIAN'
+      );
+    }
+
+    const booking = await Booking.findById(bookingId);
+    if (!booking) {
+      throw AppError.notFound('Booking not found', 'BOOKING_NOT_FOUND');
+    }
+
+    if (booking.organization?.toString() !== orgId) {
+      throw AppError.forbidden(
+        'This booking does not belong to your company.',
+        'FORBIDDEN_BOOKING_ACCESS'
+      );
+    }
+
+    // If status is ACCEPTED or SCHEDULED, transition to PROVIDER_ASSIGNED
+    if (['ACCEPTED', 'SCHEDULED'].includes(booking.status)) {
+      await BookingStateService.transition(
+        bookingId,
+        'PROVIDER_ASSIGNED',
+        { userId: actorUserId, role: actorRole as any },
+        { technicianId }
+      );
+    } else {
+      booking.technician = new Types.ObjectId(technicianId);
+      await booking.save();
+    }
+
+    // Increment assigned jobs count
+    await OrganizationMember.findByIdAndUpdate(techMembership._id, {
+      $inc: { assignedJobsCount: 1 },
+    });
+
+    // Notify technician
+    await NotificationService.createNotification({
+      recipient: technicianId,
+      sender: actorUserId,
+      booking: booking._id.toString(),
+      title: {
+        en: 'New Job Assigned!',
+        bn: 'নতুন কাজের দায়িত্ব পেয়েছেন!',
+      },
+      message: {
+        en: `You have been assigned to service booking #${booking.bookingNumber}.`,
+        bn: `আপনাকে সার্ভিস বুকিং #${booking.bookingNumber}-এর দায়িত্ব দেওয়া হয়েছে।`,
+      },
+      type: 'BOOKING_STATUS_CHANGED',
+      link: booking._id.toString(),
+    }).catch(() => {});
+
+    return (await Booking.findById(bookingId)
+      .populate('technician', 'name email phone avatarUrl')
+      .populate('service', 'name slug basePrice')
+      .populate('customer', 'name phone')) as IBooking;
+  }
+
+  /**
+   * Retrieve jobs assigned to a technician
+   */
+  static async getTechnicianJobs(
+    technicianUserId: string,
+    statusFilter?: string
+  ): Promise<IBooking[]> {
+    const query: Record<string, any> = { technician: new Types.ObjectId(technicianUserId) };
+    if (statusFilter) {
+      query.status = statusFilter;
+    }
+
+    return Booking.find(query)
+      .sort({ scheduledDate: -1, createdAt: -1 })
+      .populate('service', 'name slug basePrice pricingType')
+      .populate('customer', 'name phone avatarUrl')
+      .populate('organization', 'name contactPhone');
+  }
+
+  /**
+   * List all bookings for a company
+   */
+  static async getCompanyBookings(
+    orgId: string,
+    requestingUserId: string
+  ): Promise<IBooking[]> {
+    const org = await Organization.findById(orgId);
+    if (!org) {
+      throw AppError.notFound('Organization not found', 'ORGANIZATION_NOT_FOUND');
+    }
+
+    const isOwner = org.owner.toString() === requestingUserId;
+    const isStaff = await OrganizationMember.exists({
+      organization: orgId,
+      user: requestingUserId,
+      status: 'ACTIVE',
+    });
+
+    if (!isOwner && !isStaff) {
+      throw AppError.forbidden(
+        'You do not have permission to view bookings for this company.',
+        'FORBIDDEN_ORGANIZATION_ACCESS'
+      );
+    }
+
+    return Booking.find({ organization: orgId })
+      .sort({ createdAt: -1 })
+      .populate('technician', 'name phone avatarUrl')
+      .populate('customer', 'name phone')
+      .populate('service', 'name slug basePrice');
+  }
+
+  /**
+   * Aggregate company performance metrics & technician leaderboard
+   */
+  static async getCompanyMetrics(
+    orgId: string,
+    requestingUserId: string
+  ): Promise<CompanyMetrics> {
+    const org = await Organization.findById(orgId);
+    if (!org) {
+      throw AppError.notFound('Organization not found', 'ORGANIZATION_NOT_FOUND');
+    }
+
+    const isOwner = org.owner.toString() === requestingUserId;
+    const isStaff = await OrganizationMember.exists({
+      organization: orgId,
+      user: requestingUserId,
+      status: 'ACTIVE',
+    });
+
+    if (!isOwner && !isStaff) {
+      throw AppError.forbidden(
+        'You do not have permission to view metrics for this company.',
+        'FORBIDDEN_ORGANIZATION_ACCESS'
+      );
+    }
+
+    const orgObjectId = new Types.ObjectId(orgId);
+
+    // Bookings summary
+    const bookings = await Booking.find({ organization: orgObjectId });
+    const totalBookings = bookings.length;
+    const completedBookings = bookings.filter((b) => b.status === 'COMPLETED').length;
+    const activeBookings = bookings.filter((b) =>
+      ['SCHEDULED', 'PROVIDER_ASSIGNED', 'ON_THE_WAY', 'IN_PROGRESS'].includes(b.status)
+    ).length;
+    const cancelledBookings = bookings.filter((b) => b.status === 'CANCELLED').length;
+
+    // Gross revenue from completed and paid bookings
+    const totalGrossRevenue = bookings
+      .filter((b) => b.status === 'COMPLETED' && b.isPaid)
+      .reduce((sum, b) => sum + (b.finalPrice || b.basePrice || 0), 0);
+
+    const netRevenue = Math.round(totalGrossRevenue * 0.9);
+    const platformCommissionDue = Math.round(totalGrossRevenue * 0.1);
+
+    // Technician stats
+    const techMembers = await OrganizationMember.find({
+      organization: orgObjectId,
+      memberRole: 'TECHNICIAN',
+    }).populate('user', 'name phone email avatarUrl');
+
+    const technicianStats: TechnicianStat[] = [];
+    for (const tm of techMembers) {
+      const u = tm.user as any;
+      if (!u) continue;
+      const techId = u._id.toString();
+      const techAssigned = bookings.filter(
+        (b) => b.technician && b.technician.toString() === techId
+      ).length;
+      const techCompleted = bookings.filter(
+        (b) => b.technician && b.technician.toString() === techId && b.status === 'COMPLETED'
+      ).length;
+
+      // Reviews average for technician
+      const techReviews = await Review.find({
+        technician: new Types.ObjectId(techId),
+        status: 'ACTIVE',
+      });
+      const avg =
+        techReviews.length > 0
+          ? Math.round(
+              (techReviews.reduce((sum, r) => sum + r.rating, 0) / techReviews.length) * 10
+            ) / 10
+          : 0;
+
+      technicianStats.push({
+        technicianId: techId,
+        name: u.name,
+        phone: u.phone,
+        email: u.email,
+        avatarUrl: u.avatarUrl,
+        assignedJobsCount: techAssigned,
+        completedJobsCount: techCompleted,
+        ratingAverage: avg,
+        ratingCount: techReviews.length,
+      });
+    }
+
+    return {
+      totalBookings,
+      completedBookings,
+      activeBookings,
+      cancelledBookings,
+      totalGrossRevenue,
+      netRevenue,
+      platformCommissionDue,
+      technicianStats,
+    };
   }
 }

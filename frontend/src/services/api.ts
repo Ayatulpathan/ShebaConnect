@@ -22,6 +22,9 @@ import type {
   Review,
   CreateReviewDTO,
   ServiceReviewsResponse,
+  CompanyMetrics,
+  AddMemberDTO,
+  UpdateMemberDTO,
 } from '../types/index.js';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
@@ -194,11 +197,11 @@ export const fetchMyCompany = async (): Promise<Organization | null> => {
   const response = await apiClient.get<{
     success: boolean;
     data: { organization: Organization | null };
-  }>('/companies/my');
+  }>('/companies/my-company');
   return response.data.data.organization;
 };
 
-export const updateMyCompany = async (
+export const updateCompanyProfile = async (
   orgId: string,
   data: Partial<Organization>
 ): Promise<Organization> => {
@@ -208,6 +211,8 @@ export const updateMyCompany = async (
   }>(`/companies/${orgId}`, data);
   return response.data.data.organization;
 };
+
+export const updateMyCompany = updateCompanyProfile;
 
 export const fetchCompanyMembers = async (orgId: string): Promise<OrganizationMember[]> => {
   const response = await apiClient.get<{
@@ -219,15 +224,24 @@ export const fetchCompanyMembers = async (orgId: string): Promise<OrganizationMe
 
 export const addCompanyMember = async (
   orgId: string,
-  data: {
-    userId: string;
-    role: 'COMPANY_STAFF' | 'TECHNICIAN';
-  }
-): Promise<OrganizationMember> => {
+  data: AddMemberDTO | { userId?: string; role?: 'COMPANY_STAFF' | 'TECHNICIAN'; [key: string]: any }
+): Promise<{ member: OrganizationMember; user?: any }> => {
   const response = await apiClient.post<{
     success: boolean;
-    data: { member: OrganizationMember };
+    data: { member: OrganizationMember; user?: any };
   }>(`/companies/${orgId}/members`, data);
+  return response.data.data;
+};
+
+export const updateCompanyMember = async (
+  orgId: string,
+  memberId: string,
+  data: UpdateMemberDTO
+): Promise<OrganizationMember> => {
+  const response = await apiClient.patch<{
+    success: boolean;
+    data: { member: OrganizationMember };
+  }>(`/companies/${orgId}/members/${memberId}`, data);
   return response.data.data.member;
 };
 
@@ -579,6 +593,51 @@ export const updateReviewStatus = async (
   }>(`/reviews/${reviewId}/status`, { status });
   return response.data.data.review;
 };
+
+// ==================== Phase 9: Company & Technician Operations ====================
+
+export const assignTechnicianToBooking = async (
+  orgId: string,
+  bookingId: string,
+  technicianId: string
+): Promise<Booking> => {
+  const response = await apiClient.post<{
+    success: boolean;
+    data: { booking: Booking };
+  }>(`/companies/${orgId}/bookings/${bookingId}/assign-technician`, { technicianId });
+  return response.data.data.booking;
+};
+
+export const fetchTechnicianJobs = async (
+  status?: string
+): Promise<Booking[]> => {
+  const response = await apiClient.get<{
+    success: boolean;
+    data: { bookings: Booking[] };
+  }>('/companies/technicians/my-jobs', { params: { status } });
+  return response.data.data.bookings;
+};
+
+export const fetchCompanyBookings = async (
+  orgId: string
+): Promise<Booking[]> => {
+  const response = await apiClient.get<{
+    success: boolean;
+    data: { bookings: Booking[] };
+  }>(`/companies/${orgId}/bookings`);
+  return response.data.data.bookings;
+};
+
+export const fetchCompanyMetrics = async (
+  orgId: string
+): Promise<CompanyMetrics> => {
+  const response = await apiClient.get<{
+    success: boolean;
+    data: { metrics: CompanyMetrics };
+  }>(`/companies/${orgId}/metrics`);
+  return response.data.data.metrics;
+};
+
 
 
 

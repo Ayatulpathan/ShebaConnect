@@ -67,23 +67,41 @@ export interface ProviderProfile {
 
 export interface Organization {
   _id: string;
+  id?: string;
   owner: string | User;
-  businessName: string;
+  name: string;
+  businessName?: string;
+  tradeLicense: string;
   tradeLicenseNumber?: string;
-  businessAddress?: UserAddress;
+  address: string;
+  businessAddress?: UserAddress | string;
   contactEmail?: string;
   contactPhone: string;
   serviceAreas: string[];
-  verificationStatus: VerificationStatus;
-  isActive: boolean;
+  approvalStatus?: OrganizationApprovalStatus;
+  verificationStatus?: VerificationStatus;
+  isVerified?: boolean;
+  isActive?: boolean;
+  logoUrl?: string;
+  description?: string;
+  ratingAverage?: number;
+  ratingCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface OrganizationMember {
   _id: string;
+  id?: string;
   organization: string | Organization;
-  user: User;
-  role: 'COMPANY_STAFF' | 'TECHNICIAN';
-  isActive: boolean;
+  user: User | any;
+  memberRole: 'STAFF' | 'TECHNICIAN';
+  role?: 'COMPANY_STAFF' | 'TECHNICIAN';
+  status: 'ACTIVE' | 'INACTIVE';
+  isActive?: boolean;
+  assignedJobsCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface AvailabilitySlot {
@@ -461,6 +479,42 @@ export interface ServiceReviewsResponse {
     total: number;
     totalPages: number;
   };
+}
+
+export interface TechnicianStat {
+  technicianId: string;
+  name: string;
+  phone: string;
+  email: string;
+  avatarUrl?: string;
+  assignedJobsCount: number;
+  completedJobsCount: number;
+  ratingAverage: number;
+  ratingCount: number;
+}
+
+export interface CompanyMetrics {
+  totalBookings: number;
+  completedBookings: number;
+  activeBookings: number;
+  cancelledBookings: number;
+  totalGrossRevenue: number;
+  netRevenue: number;
+  platformCommissionDue: number;
+  technicianStats: TechnicianStat[];
+}
+
+export interface AddMemberDTO {
+  name: string;
+  email: string;
+  phone: string;
+  memberRole: 'STAFF' | 'TECHNICIAN';
+  password: string;
+}
+
+export interface UpdateMemberDTO {
+  memberRole?: 'STAFF' | 'TECHNICIAN';
+  status?: 'ACTIVE' | 'INACTIVE';
 }
 
 

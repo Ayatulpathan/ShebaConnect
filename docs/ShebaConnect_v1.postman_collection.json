@@ -57,6 +57,11 @@
       "type": "string"
     },
     {
+      "key": "technicianId",
+      "value": "",
+      "type": "string"
+    },
+    {
       "key": "quoteId",
       "value": "",
       "type": "string"
@@ -999,6 +1004,91 @@
               "raw": "{{baseUrl}}/api/{{apiVersion}}/reviews/{{reviewId}}/status",
               "host": ["{{baseUrl}}"],
               "path": ["api", "{{apiVersion}}", "reviews", "{{reviewId}}", "status"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "13. Company & Technician Operations",
+      "item": [
+        {
+          "name": "Get Technician Assigned Jobs",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/companies/technicians/my-jobs",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "companies", "technicians", "my-jobs"]
+            }
+          }
+        },
+        {
+          "name": "Assign Technician to Booking",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"technicianId\": \"{{technicianId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/companies/{{organizationId}}/bookings/{{bookingId}}/assign-technician",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "companies", "{{organizationId}}", "bookings", "{{bookingId}}", "assign-technician"]
+            }
+          }
+        },
+        {
+          "name": "Get Company Bookings",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/companies/{{organizationId}}/bookings",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "companies", "{{organizationId}}", "bookings"]
+            }
+          }
+        },
+        {
+          "name": "Get Company Performance Metrics",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/companies/{{organizationId}}/metrics",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "companies", "{{organizationId}}", "metrics"]
+            }
+          }
+        },
+        {
+          "name": "Update Company Member Role or Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"memberRole\": \"TECHNICIAN\",\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/companies/{{organizationId}}/members/{{memberId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "companies", "{{organizationId}}", "members", "{{memberId}}"]
             }
           }
         }

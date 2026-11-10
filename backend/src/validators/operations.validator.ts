@@ -61,3 +61,12 @@ export const addOrganizationMemberSchema = z.object({
       'Password must contain at least one uppercase letter, one lowercase letter, and one number'
     ),
 });
+
+export const assignTechnicianSchema = z.object({
+  technicianId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid Technician ID format'),
+});
+
+export const updateOrganizationMemberSchema = z.object({
+  memberRole: z.enum(['STAFF', 'TECHNICIAN']).optional(),
+  status: z.enum(['ACTIVE', 'INACTIVE']).optional(),
+});
