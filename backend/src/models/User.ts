@@ -14,8 +14,9 @@ export interface IUser extends Document {
   _id: mongoose.Types.ObjectId;
   name: string;
   email: string;
-  phone: string;
+  phone?: string;
   password?: string;
+  googleId?: string;
   role: UserRole;
   status: 'ACTIVE' | 'SUSPENDED' | 'PENDING';
   isVerified: boolean;
@@ -82,8 +83,9 @@ const UserSchema = new Schema<IUser>(
     },
     phone: {
       type: String,
-      required: [true, 'Phone number is required'],
+      required: false,
       unique: true,
+      sparse: true,
       trim: true,
       match: [
         /^(?:\+8801|01)[3-9]\d{8}$/,
@@ -93,9 +95,15 @@ const UserSchema = new Schema<IUser>(
     },
     password: {
       type: String,
-      required: [true, 'Password is required'],
+      required: false,
       minlength: [8, 'Password must be at least 8 characters'],
       select: false, // Never return password hash in queries by default
+    },
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true,
+      index: true,
     },
     role: {
       type: String,

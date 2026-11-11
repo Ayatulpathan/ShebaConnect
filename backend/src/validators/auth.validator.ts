@@ -83,3 +83,10 @@ export const addressSchema = z.object({
 });
 
 export const updateAddressSchema = addressSchema.partial();
+
+export const googleAuthSchema = z.object({
+  idToken: z.string({ required_error: 'Google ID token is required' }).min(10, 'Invalid Google ID token format'),
+  role: z
+    .enum(PUBLIC_REGISTRATION_ROLES as [UserRole, ...UserRole[]])
+    .optional(),
+});

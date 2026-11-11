@@ -49,6 +49,27 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
   }
 };
 
+export const googleLogin = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { idToken, role } = req.body;
+    const { user, tokens } = await AuthService.loginWithGoogle(idToken, role);
+
+    res.cookie('refreshToken', tokens.refreshToken, COOKIE_OPTIONS);
+
+    res.status(200).json({
+      success: true,
+      message: 'Google authentication successful',
+      data: {
+        user,
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const refresh = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const token = req.cookies.refreshToken || req.body.refreshToken;

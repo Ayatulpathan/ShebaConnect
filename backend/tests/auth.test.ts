@@ -299,4 +299,56 @@ describe('ShebaConnect Phase 2 — Authentication & RBAC Integration Tests', () 
       expect(reusedRes.body.error.code).toBe('TOKEN_REUSE_DETECTED');
     });
   });
+
+  describe('Google Authentication (POST /api/v1/auth/google)', () => {
+    it('should register a new user on first Google sign-in', async () => {
+      const res = await request(app)
+        .post('/api/v1/auth/google')
+        .send({
+          idToken: 'mock-google-token:google-id-101:google.user@example.com:Google Person',
+          role: 'CUSTOMER',
+        });
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.user.email).toBe('google.user@example.com');
+      expect(res.body.data.user.name).toBe('Google Person');
+      expect(res.body.data.user.role).toBe('CUSTOMER');
+      expect(res.body.data).toHaveProperty('accessToken');
+      expect(res.body.data).toHaveProperty('refreshToken');
+
+      const user = await User.findOne({ email: 'google.user@example.com' });
+      expect(user).not.toBeNull();
+      expect(user?.googleId).toBe('google-id-101');
+    });
+
+    it('should log in existing user and link Google account', async () => {
+      // First sign in
+      await request(app)
+        .post('/api/v1/auth/google')
+        .send({
+          idToken: 'mock-google-token:google-id-202:existing.google@example.com:Existing Google',
+        });
+
+      // Second sign in (login)
+      const res = await request(app)
+        .post('/api/v1/auth/google')
+        .send({
+          idToken: 'mock-google-token:google-id-202:existing.google@example.com:Existing Google',
+        });
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.user.email).toBe('existing.google@example.com');
+      expect(res.body.data).toHaveProperty('accessToken');
+    });
+
+    it('should reject invalid or missing Google token', async () => {
+      const res = await request(app)
+        .post('/api/v1/auth/google')
+        .send({ idToken: 'short' });
+
+      expect(res.status).toBe(400);
+    });
+  });
 });

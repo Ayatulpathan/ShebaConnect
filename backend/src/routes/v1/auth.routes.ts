@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   register,
   login,
+  googleLogin,
   refresh,
   logout,
   forgotPassword,
@@ -12,6 +13,7 @@ import { validateBody } from '../../middleware/validate.middleware.js';
 import {
   registerSchema,
   loginSchema,
+  googleAuthSchema,
   refreshTokenSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
@@ -22,6 +24,7 @@ const router = Router();
 
 router.post('/register', validateBody(registerSchema), register);
 router.post('/login', validateBody(loginSchema), login);
+router.post('/google', validateBody(googleAuthSchema), googleLogin);
 router.post('/refresh', validateBody(refreshTokenSchema), refresh);
 router.post('/logout', authenticate, logout);
 router.post('/forgot-password', validateBody(forgotPasswordSchema), forgotPassword);

@@ -19,6 +19,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (identifier: string, password: string) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
+  loginWithGoogle: (idToken: string, role?: UserRole) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -78,6 +79,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('shebaconnect_token', token);
   };
 
+  const loginWithGoogle = async (idToken: string, role?: UserRole) => {
+    const res = await apiClient.post('/auth/google', { idToken, role });
+    const { user: userData, accessToken: token } = res.data.data;
+
+    setUser(userData);
+    setAccessToken(token);
+    setApiAccessToken(token);
+    initSocket(token);
+    localStorage.setItem('shebaconnect_token', token);
+  };
+
   const logout = async () => {
     try {
       await apiClient.post('/auth/logout');
@@ -101,6 +113,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoading,
         login,
         register,
+        loginWithGoogle,
         logout,
       }}
     >
