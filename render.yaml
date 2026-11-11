@@ -1,6 +1,6 @@
 services:
   # ====================================================================
-  # 1. ShebaConnect Backend API (Render Free Web Service)
+  # ShebaConnect Backend API (Render Free Web Service)
   # ====================================================================
   - type: web
     name: shebaconnect-backend
@@ -25,22 +25,3 @@ services:
         generateValue: true
       - key: JWT_REFRESH_SECRET
         generateValue: true
-
-  # ====================================================================
-  # 2. ShebaConnect Frontend (Render Free Static Site fallback)
-  # ====================================================================
-  - type: web
-    name: shebaconnect-frontend
-    runtime: static
-    plan: free
-    rootDir: frontend
-    buildCommand: npm install && npm run build
-    staticPublishPath: dist
-    autoDeploy: true
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
-    envVars:
-      - key: VITE_API_URL
-        sync: false
