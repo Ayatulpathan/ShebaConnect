@@ -152,23 +152,23 @@ export const NotificationBell: React.FC<Props> = ({ onOpenBooking }) => {
 
   return (
     <div className="relative" ref={dropdownRef}>
-      {/* Bell Button */}
+      {/* 3D Bell Button */}
       <button
         onClick={toggleDropdown}
         aria-label="Notifications"
-        className="relative p-2 text-gray-600 hover:text-brand-600 hover:bg-gray-100 rounded-full transition-colors focus:outline-none"
+        className="btn-3d relative p-2 text-slate-600 hover:text-brand-600 hover:bg-slate-100 rounded-full transition-all focus:outline-none"
       >
         <Bell className="w-5 h-5" />
         {unreadCount > 0 && (
-          <span className="absolute top-1 right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-black text-white bg-red-600 rounded-full ring-2 ring-white animate-pulse">
+          <span className="absolute top-1 right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-black text-white bg-gradient-to-tr from-rose-600 to-red-500 rounded-full ring-2 ring-white animate-pulse shadow-md">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
       </button>
 
-      {/* Dropdown Menu */}
+      {/* 3D Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 md:w-96 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+        <div className="modal-3d-enter preserve-3d absolute right-0 mt-2 w-80 md:w-96 bg-white/95 backdrop-blur-md rounded-2xl shadow-3d-emerald border border-slate-100 py-2 z-50">
           {/* Header */}
           <div className="px-4 py-2.5 border-b border-gray-100 flex items-center justify-between">
             <div className="flex items-center gap-2">

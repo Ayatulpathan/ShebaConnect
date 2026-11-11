@@ -213,17 +213,18 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl max-h-[92vh] flex flex-col overflow-hidden border border-gray-100">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-md animate-fade-in overflow-y-auto perspective-1000">
+      <div className="modal-3d-enter preserve-3d bg-white rounded-3xl shadow-3d-emerald w-full max-w-6xl max-h-[92vh] flex flex-col overflow-hidden border border-slate-100">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-emerald-700 via-teal-700 to-emerald-800 text-white">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-emerald-800 via-teal-800 to-emerald-900 text-white">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-white/10 backdrop-blur-md rounded-xl">
-              <ShieldCheck className="w-6 h-6 text-emerald-200" />
+            <div className="p-2 bg-white/10 backdrop-blur-md rounded-xl shadow-inner animate-float-3d">
+              <ShieldCheck className="w-6 h-6 text-emerald-300" />
             </div>
             <div>
-              <h2 className="text-xl font-bold">
-                {isBn ? 'সেবাকানেক্ট অ্যাডমিন ও মার্কেটপ্লেস নিয়ন্ত্রণ' : 'ShebaConnect Admin & Marketplace Governance'}
+              <h2 className="text-xl font-extrabold flex items-center gap-2">
+                <span>{isBn ? 'সেবাকানেক্ট অ্যাডমিন ও মার্কেটপ্লেস নিয়ন্ত্রণ' : 'ShebaConnect Admin & Marketplace Governance'}</span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/20 text-emerald-200 border border-emerald-400/30 uppercase font-bold">3D Admin Control</span>
               </h2>
               <p className="text-xs text-emerald-100">
                 {isBn
@@ -346,7 +347,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                   {isBn ? 'মার্কেটপ্লেস ব্যবহারকারী ও প্রতিষ্ঠান' : 'Users & Providers'}
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                  <div className="tile-3d preserve-3d bg-white p-4 rounded-2xl border border-slate-200/90 shadow-sm">
                     <p className="text-xs text-gray-500">{isBn ? 'মোট ব্যবহারকারী' : 'Total Users'}</p>
                     <p className="text-2xl font-bold text-gray-900 mt-1">{overview.users.total}</p>
                     <p className="text-xs text-emerald-600 mt-1">
@@ -354,7 +355,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                     </p>
                   </div>
 
-                  <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                  <div className="tile-3d preserve-3d bg-white p-4 rounded-2xl border border-slate-200/90 shadow-sm">
                     <p className="text-xs text-gray-500">{isBn ? 'ব্যক্তিগত প্রোভাইডার' : 'Individual Providers'}</p>
                     <p className="text-2xl font-bold text-gray-900 mt-1">{overview.users.individualProviders}</p>
                     <p className="text-xs text-blue-600 mt-1">
@@ -362,7 +363,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                     </p>
                   </div>
 
-                  <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                  <div className="tile-3d preserve-3d bg-white p-4 rounded-2xl border border-slate-200/90 shadow-sm">
                     <p className="text-xs text-gray-500">{isBn ? 'নিবন্ধিত কোম্পানি' : 'Registered Companies'}</p>
                     <p className="text-2xl font-bold text-gray-900 mt-1">{overview.users.registeredCompanies}</p>
                     <p className="text-xs text-indigo-600 mt-1">
@@ -370,7 +371,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                     </p>
                   </div>
 
-                  <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                  <div className="tile-3d preserve-3d bg-white p-4 rounded-2xl border border-slate-200/90 shadow-sm">
                     <p className="text-xs text-gray-500">{isBn ? 'অপেক্ষমান আবেদন' : 'Pending Verifications'}</p>
                     <p className="text-2xl font-bold text-amber-600 mt-1">
                       {overview.users.pendingProviderVerifications + overview.users.pendingCompanyApprovals}

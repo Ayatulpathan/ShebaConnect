@@ -100,8 +100,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl max-w-md w-full p-6 sm:p-8 relative shadow-2xl animate-in fade-in zoom-in-95 duration-200 max-h-[95vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-4 perspective-1000">
+      <div className="modal-3d-enter preserve-3d bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 relative shadow-3d-emerald border border-slate-100 max-h-[95vh] overflow-y-auto">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -147,10 +147,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setRole('CUSTOMER')}
-                    className={`py-2 px-1 text-xs rounded-lg font-medium border text-center transition-colors ${
+                    className={`tile-3d py-2.5 px-1 text-xs rounded-xl font-bold border text-center transition-all ${
                       role === 'CUSTOMER'
-                        ? 'bg-brand-50 border-brand-600 text-brand-700 font-bold'
-                        : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                        ? 'bg-brand-50 border-brand-600 text-brand-700 shadow-sm'
+                        : 'border-slate-200 text-slate-600 hover:bg-slate-50'
                     }`}
                   >
                     {language === 'bn' ? 'গ্রাহক' : 'Customer'}
@@ -158,10 +158,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setRole('INDIVIDUAL_PROVIDER')}
-                    className={`py-2 px-1 text-xs rounded-lg font-medium border text-center transition-colors ${
+                    className={`tile-3d py-2.5 px-1 text-xs rounded-xl font-bold border text-center transition-all ${
                       role === 'INDIVIDUAL_PROVIDER'
-                        ? 'bg-brand-50 border-brand-600 text-brand-700 font-bold'
-                        : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                        ? 'bg-brand-50 border-brand-600 text-brand-700 shadow-sm'
+                        : 'border-slate-200 text-slate-600 hover:bg-slate-50'
                     }`}
                   >
                     {language === 'bn' ? 'টেকনিশিয়ান' : 'Technician'}
@@ -169,10 +169,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setRole('COMPANY_OWNER')}
-                    className={`py-2 px-1 text-xs rounded-lg font-medium border text-center transition-colors ${
+                    className={`tile-3d py-2.5 px-1 text-xs rounded-xl font-bold border text-center transition-all ${
                       role === 'COMPANY_OWNER'
-                        ? 'bg-brand-50 border-brand-600 text-brand-700 font-bold'
-                        : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                        ? 'bg-brand-50 border-brand-600 text-brand-700 shadow-sm'
+                        : 'border-slate-200 text-slate-600 hover:bg-slate-50'
                     }`}
                   >
                     {language === 'bn' ? 'কোম্পানি' : 'Company'}
@@ -276,7 +276,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 px-4 bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm rounded-xl shadow-md transition-colors disabled:opacity-50 mt-2"
+            className="btn-3d w-full py-2.5 px-4 bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm rounded-xl shadow-3d-emerald transition-colors disabled:opacity-50 mt-2"
           >
             {loading
               ? language === 'bn'
@@ -304,13 +304,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </div>
         </div>
 
-        {/* Google Sign In Section */}
+        {/* Google Sign In Section with 3D Tactile Physics */}
         <div>
           <button
             type="button"
             onClick={handleGoogleSignIn}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 py-2.5 px-4 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold text-sm rounded-xl shadow-sm transition-colors disabled:opacity-50"
+            className="btn-3d w-full flex items-center justify-center gap-3 py-2.5 px-4 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-sm rounded-xl shadow-sm transition-all disabled:opacity-50"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path

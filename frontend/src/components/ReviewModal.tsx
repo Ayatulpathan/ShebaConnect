@@ -95,14 +95,15 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-      <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-md animate-fade-in perspective-1000">
+      <div className="modal-3d-enter preserve-3d relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-3d-emerald border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-emerald-50/50 dark:bg-emerald-950/20">
+        <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-gradient-to-r from-emerald-50/70 via-white to-amber-50/40 dark:bg-emerald-950/20">
           <div>
             <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
-              {language === 'bn' ? 'সেবার রিভিউ ও রেটিং দিন' : 'Rate & Review Service'}
+              <Star className="w-5 h-5 text-amber-500 fill-amber-500 animate-pulse" />
+              <span>{language === 'bn' ? 'সেবার রিভিউ ও রেটিং দিন' : 'Rate & Review Service'}</span>
+              <span className="px-1.5 py-0.5 rounded-full text-[9px] bg-amber-100 text-amber-800 font-extrabold uppercase">3D Star</span>
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
               {serviceTitle}
@@ -133,12 +134,12 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
             </div>
           )}
 
-          {/* Overall Rating Stars */}
-          <div className="text-center py-2 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
-            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
+          {/* Overall Rating Stars with 3D Physics */}
+          <div className="glass-3d-card text-center py-4 bg-gradient-to-b from-amber-50/50 to-white dark:bg-slate-800/50 rounded-2xl border border-amber-100/80 dark:border-slate-800 shadow-sm">
+            <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2.5">
               {language === 'bn' ? 'সার্বিক সন্তুষ্টি রেটিং' : 'Overall Satisfaction'}
             </label>
-            <div className="flex items-center justify-center gap-2">
+            <div className="flex items-center justify-center gap-3">
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
                   type="button"
@@ -147,10 +148,10 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
                   onMouseEnter={() => setHoverRating(star)}
                   onMouseLeave={() => setHoverRating(null)}
                   onClick={() => setRating(star)}
-                  className="p-1 transition-transform hover:scale-125 focus:outline-none"
+                  className="star-3d p-1.5 focus:outline-none"
                 >
                   <Star
-                    className={`w-8 h-8 transition-colors ${
+                    className={`w-9 h-9 transition-colors ${
                       (hoverRating !== null ? hoverRating >= star : rating >= star)
                         ? 'text-amber-400 fill-amber-400'
                         : 'text-slate-300 dark:text-slate-600'
@@ -244,7 +245,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
             <button
               type="submit"
               disabled={submitting}
-              className="px-5 py-2 text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 active:scale-95 disabled:opacity-50 rounded-xl shadow-md transition flex items-center gap-2"
+              className="btn-3d px-6 py-2.5 text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 rounded-xl shadow-3d-emerald transition flex items-center gap-2"
             >
               {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
               {language === 'bn' ? 'রিভিউ জমা দিন' : 'Submit Review'}

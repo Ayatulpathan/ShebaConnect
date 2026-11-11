@@ -322,17 +322,18 @@ export const BookingTrackerModal: React.FC<Props> = ({
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-        <div className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[92vh]">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-md animate-in fade-in duration-200 perspective-1000">
+        <div className="modal-3d-enter preserve-3d relative w-full max-w-4xl bg-white rounded-3xl shadow-3d-emerald border border-slate-100 overflow-hidden flex flex-col max-h-[92vh]">
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-emerald-50/70 via-white to-slate-50">
             <div className="flex items-center gap-2.5">
-              <div className="p-2 bg-brand-100 text-brand-700 rounded-xl">
+              <div className="p-2 bg-gradient-to-tr from-brand-700 to-emerald-500 text-white rounded-xl shadow-md">
                 <Clock className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-base font-bold text-gray-900">
-                  {language === 'bn' ? 'বুকিং ট্র্যাকার ও ব্যবস্থাপনা' : 'Booking Tracker & Operations'}
+                <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                  <span>{language === 'bn' ? 'বুকিং ট্র্যাকার ও ব্যবস্থাপনা' : 'Booking Tracker & Operations'}</span>
+                  <span className="px-1.5 py-0.5 rounded-full text-[9px] bg-emerald-100 text-emerald-800 font-bold uppercase">3D Live</span>
                 </h2>
                 <p className="text-xs text-gray-500">
                   {language === 'bn'
@@ -396,10 +397,10 @@ export const BookingTrackerModal: React.FC<Props> = ({
                     <button
                       key={b._id}
                       onClick={() => setSelectedBooking(b)}
-                      className={`w-full text-left p-3 rounded-2xl border transition-all ${
+                      className={`tile-3d preserve-3d w-full text-left p-3 rounded-2xl border transition-all ${
                         isSelected
-                          ? 'border-brand-500 bg-brand-50/50 shadow-sm'
-                          : 'border-gray-100 hover:border-gray-200 bg-white'
+                          ? 'border-brand-500 bg-brand-50/80 shadow-3d-emerald font-semibold'
+                          : 'border-slate-100 hover:border-slate-200 bg-white'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1">
@@ -481,9 +482,9 @@ export const BookingTrackerModal: React.FC<Props> = ({
                     </div>
                   </div>
 
-                  {/* Lifecycle Tracker */}
-                  <div>
-                    <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
+                  {/* Lifecycle Tracker with 3D Spatial Nodes */}
+                  <div className="p-3 bg-gradient-to-r from-slate-50 via-emerald-50/30 to-slate-50 rounded-2xl border border-slate-100">
+                    <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">
                       {language === 'bn' ? 'অগ্রগতি ট্র্যাকার' : 'Service Progress'}
                     </h4>
                     <div className="grid grid-cols-6 gap-1">
@@ -493,17 +494,17 @@ export const BookingTrackerModal: React.FC<Props> = ({
                         return (
                           <div key={step.status} className="flex flex-col items-center text-center">
                             <div
-                              className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                              className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-extrabold transition-all duration-300 ${
                                 isDone
-                                  ? 'bg-brand-600 text-white shadow-sm'
-                                  : 'bg-gray-100 text-gray-400'
-                              } ${isCurrent ? 'ring-2 ring-brand-300 ring-offset-2' : ''}`}
+                                  ? 'bg-gradient-to-tr from-brand-700 to-emerald-500 text-white shadow-3d-emerald scale-105'
+                                  : 'bg-slate-100 text-slate-400'
+                              } ${isCurrent ? 'ring-4 ring-emerald-300 ring-offset-2 animate-pulse scale-110' : ''}`}
                             >
                               {isDone ? '✓' : idx + 1}
                             </div>
                             <span
-                              className={`text-[10px] mt-1 font-medium ${
-                                isDone ? 'text-gray-900 font-bold' : 'text-gray-400'
+                              className={`text-[10px] mt-1.5 font-medium ${
+                                isDone ? 'text-slate-900 font-bold' : 'text-slate-400'
                               }`}
                             >
                               {step[language]}
@@ -883,16 +884,21 @@ export const BookingTrackerModal: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* Official Receipt Modal */}
+      {/* Official Holographic 3D Cash Receipt Modal */}
       {showReceiptModal && receipt && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-gray-100 p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-in fade-in duration-200 perspective-1000">
+          <div className="receipt-3d modal-3d-enter preserve-3d relative w-full max-w-md rounded-3xl p-7 space-y-4">
+            <div className="flex items-center justify-between border-b border-dashed border-slate-300 pb-3">
               <div className="flex items-center gap-2">
-                <Receipt className="w-5 h-5 text-emerald-600" />
-                <h3 className="font-bold text-gray-900 text-sm">
-                  {language === 'bn' ? 'অফিসিয়াল ক্যাশ রসিদ' : 'Official Cash Receipt'}
-                </h3>
+                <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-md animate-float-3d">
+                  <Receipt className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-slate-900 text-sm">
+                    {language === 'bn' ? 'অফিসিয়াল ক্যাশ রসিদ' : 'Official Cash Receipt'}
+                  </h3>
+                  <span className="text-[10px] text-emerald-700 font-semibold uppercase tracking-wider">৳০ প্ল্যাটফর্ম ফি • ভেরিফাইড ক্যাশ</span>
+                </div>
               </div>
               <button
                 onClick={() => setShowReceiptModal(false)}
@@ -967,7 +973,7 @@ export const BookingTrackerModal: React.FC<Props> = ({
               <button
                 type="button"
                 onClick={() => window.print()}
-                className="w-full py-2 bg-gray-900 hover:bg-black text-white rounded-xl text-xs font-bold"
+                className="btn-3d w-full py-2.5 bg-slate-900 hover:bg-black text-white rounded-xl text-xs font-bold shadow-lg"
               >
                 {language === 'bn' ? 'রসিদ প্রিন্ট / সংরক্ষণ' : 'Print / Save Receipt'}
               </button>

@@ -9,11 +9,15 @@
 }
 
 /* ==========================================================================
-   3D Spatial, Perspective & Depth System (ShebaConnect 3D Engine)
+   3D Spatial, Perspective & Motion Engine (ShebaConnect 3D Ecosystem)
    ========================================================================== */
 
 .preserve-3d {
   transform-style: preserve-3d;
+}
+
+.perspective-800 {
+  perspective: 800px;
 }
 
 .perspective-1000 {
@@ -44,13 +48,82 @@
   backface-visibility: hidden;
 }
 
+/* Base identity transforms for state transitions (Modern Web Guidance rule) */
+.btn-3d {
+  translate: 0px 0px;
+  rotate: 0deg;
+  scale: 1;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tile-3d {
+  translate: 0px 0px;
+  rotate: 0deg;
+  scale: 1;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease;
+}
+
+.star-3d {
+  translate: 0px 0px;
+  rotate: 0deg;
+  scale: 1;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease;
+}
+
+/* 3D Interactive Hover & Active Physics (Reduced-motion safe) */
+@media (prefers-reduced-motion: no-preference) {
+  .btn-3d:hover {
+    transform: translateY(-2px) translateZ(10px);
+    box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4);
+  }
+  .btn-3d:active {
+    transform: translateY(1px) translateZ(0);
+  }
+
+  .tile-3d:hover {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 8px 18px -4px rgba(16, 185, 129, 0.3);
+  }
+  .tile-3d:active {
+    transform: translateY(0px) scale(0.97);
+  }
+
+  .star-3d:hover {
+    transform: scale(1.35) rotateY(180deg);
+    filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.8));
+  }
+}
+
+/* 3D Modal Entry / Exit Animation */
+.modal-3d-enter {
+  transform: perspective(1000px) rotateX(0deg) translateY(0) scale(1);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .modal-3d-enter {
+    animation: modal-3d-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transform-origin: center top;
+  }
+}
+
+@keyframes modal-3d-in {
+  from {
+    opacity: 0;
+    transform: perspective(1000px) rotateX(10deg) translateY(20px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(1000px) rotateX(0deg) translateY(0) scale(1);
+  }
+}
+
 /* Floating 3D Physics Keyframes */
 @keyframes float-gentle {
   0%, 100% {
     transform: translateY(0px) rotate(0deg);
   }
   50% {
-    transform: translateY(-8px) rotate(0.5deg);
+    transform: translateY(-8px) rotate(0.6deg);
   }
 }
 
@@ -59,7 +132,7 @@
     transform: translateY(0px) rotate(0deg);
   }
   50% {
-    transform: translateY(8px) rotate(-0.5deg);
+    transform: translateY(8px) rotate(-0.6deg);
   }
 }
 
@@ -74,7 +147,15 @@
   }
 }
 
-/* Apply 3D Float with Reduced-Motion Safety */
+@keyframes coin-spin-3d {
+  0% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(360deg);
+  }
+}
+
 .animate-float-3d {
   transform: translateY(0px);
 }
@@ -88,6 +169,9 @@
   }
   .animate-pulse-glow {
     animation: pulse-glow 3s ease-in-out infinite;
+  }
+  .animate-coin-spin {
+    animation: coin-spin-3d 6s linear infinite;
   }
 }
 
@@ -124,4 +208,14 @@
   box-shadow:
     0 25px 60px -15px rgba(16, 185, 129, 0.22),
     0 10px 25px -5px rgba(0, 0, 0, 0.05);
+}
+
+/* 3D Holographic Cash Receipt Card */
+.receipt-3d {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px dashed rgba(203, 213, 225, 0.9);
+  box-shadow:
+    0 20px 40px -15px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+  transform-style: preserve-3d;
 }

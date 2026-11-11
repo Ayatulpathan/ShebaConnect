@@ -207,17 +207,18 @@ export const ProviderOperationsModal: React.FC<Props> = ({ isOpen, onClose }) =>
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-md animate-in fade-in duration-200 perspective-1000">
+      <div className="modal-3d-enter preserve-3d relative w-full max-w-2xl bg-white rounded-3xl shadow-3d-emerald border border-slate-100 overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-emerald-50/70 via-white to-slate-50">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-brand-100 text-brand-700 rounded-xl">
+            <div className="p-2 bg-gradient-to-tr from-brand-700 to-emerald-500 text-white rounded-xl shadow-md">
               <UserCheck className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-gray-900">
-                {language === 'bn' ? 'টেকনিশিয়ান হাব ও পরিচালনা' : 'Technician Hub & Operations'}
+              <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <span>{language === 'bn' ? 'টেকনিশিয়ান হাব ও পরিচালনা' : 'Technician Hub & Operations'}</span>
+                <span className="px-1.5 py-0.5 rounded-full text-[9px] bg-emerald-100 text-emerald-800 font-bold uppercase">3D Console</span>
               </h2>
               <p className="text-xs text-gray-500">
                 {language === 'bn'
@@ -513,10 +514,10 @@ export const ProviderOperationsModal: React.FC<Props> = ({ isOpen, onClose }) =>
                       return (
                         <div
                           key={day.id}
-                          className={`flex items-center justify-between p-3 rounded-2xl border text-xs transition-colors ${
+                          className={`tile-3d preserve-3d flex items-center justify-between p-3.5 rounded-2xl border text-xs transition-all ${
                             slot.isAvailable
-                              ? 'bg-white border-gray-200'
-                              : 'bg-gray-50/70 border-gray-100 opacity-60'
+                              ? 'bg-white border-slate-200 shadow-sm'
+                              : 'bg-slate-50/70 border-slate-100 opacity-60'
                           }`}
                         >
                           <div className="w-28 font-bold text-gray-800">
@@ -576,7 +577,7 @@ export const ProviderOperationsModal: React.FC<Props> = ({ isOpen, onClose }) =>
                       type="button"
                       onClick={handleSaveAvailability}
                       disabled={saving}
-                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all disabled:opacity-50"
+                      className="btn-3d inline-flex items-center gap-2 px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-bold shadow-3d-emerald transition-all disabled:opacity-50"
                     >
                       {saving ? (
                         <Loader2 className="w-4 h-4 animate-spin" />

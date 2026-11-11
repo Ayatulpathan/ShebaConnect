@@ -144,21 +144,22 @@ export const BookingModal: React.FC<Props> = ({
   const serviceTitle = language === 'bn' ? service.name.bn : service.name.en;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[92vh]">
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-md animate-in fade-in duration-200 perspective-1000">
+      <div className="modal-3d-enter preserve-3d relative w-full max-w-lg bg-white rounded-3xl shadow-3d-emerald border border-slate-100 overflow-hidden flex flex-col max-h-[92vh]">
+        {/* Header with 3D Depth */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-emerald-50/70 via-white to-slate-50">
           <div>
-            <span className="text-[10px] font-bold tracking-wider text-brand-600 uppercase">
-              {language === 'bn' ? 'সার্ভিস বুকিং' : 'Service Booking'}
+            <span className="text-[10px] font-extrabold tracking-wider text-brand-600 uppercase flex items-center gap-1">
+              <span>{language === 'bn' ? 'সার্ভিস বুকিং' : 'Service Booking'}</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
             </span>
-            <h2 className="text-base font-bold text-gray-900 leading-tight">
+            <h2 className="text-base font-bold text-slate-900 leading-tight">
               {serviceTitle}
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-700 rounded-full hover:bg-gray-100 transition-colors"
+            className="p-2 text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-100 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -315,7 +316,7 @@ export const BookingModal: React.FC<Props> = ({
                   <select
                     value={timeSlot}
                     onChange={(e) => setTimeSlot(e.target.value)}
-                    className="w-full px-3 py-1.5 text-xs border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    className="w-full px-3 py-1.5 text-xs border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 mb-2"
                   >
                     {TIME_SLOTS.map((slot) => (
                       <option key={slot.id} value={slot.en}>
@@ -323,19 +324,48 @@ export const BookingModal: React.FC<Props> = ({
                       </option>
                     ))}
                   </select>
+
+                  {/* 3D Interactive Slot Selector Grid */}
+                  <div className="grid grid-cols-2 gap-2 mt-1">
+                    {TIME_SLOTS.map((slot) => {
+                      const isSelected = timeSlot === slot.en;
+                      return (
+                        <button
+                          key={slot.id}
+                          type="button"
+                          onClick={() => setTimeSlot(slot.en)}
+                          className={`tile-3d text-left p-2 rounded-xl border text-[11px] font-semibold transition-all ${
+                            isSelected
+                              ? 'bg-brand-50/90 border-brand-500 text-brand-700 shadow-sm ring-1 ring-brand-400'
+                              : 'bg-white border-slate-200 text-slate-600 hover:border-brand-200'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="truncate">{language === 'bn' ? slot.bn.split(' ')[0] : slot.en.split(' ')[0]}</span>
+                            {isSelected && <span className="w-2 h-2 rounded-full bg-brand-500 shrink-0"></span>}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
 
-              {/* Zero-Cost Cash Policy Banner */}
-              <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-start gap-2.5 text-xs text-emerald-800">
-                <Banknote className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+              {/* Zero-Cost Cash Policy Banner with 3D Depth */}
+              <div className="glass-3d-card p-3.5 bg-gradient-to-r from-emerald-50/90 to-teal-50/70 border border-emerald-200/80 rounded-2xl flex items-start gap-3 text-xs text-emerald-900 shadow-sm">
+                <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md animate-float-3d">
+                  <Banknote className="w-4 h-4" />
+                </div>
                 <div>
-                  <p className="font-bold">
-                    {language === 'bn'
-                      ? 'ক্যাশ অন সার্ভিস (পরিশোধ কাজ শেষের পর)'
-                      : 'Cash After Service Only'}
+                  <p className="font-bold flex items-center gap-1.5">
+                    <span>
+                      {language === 'bn'
+                        ? 'ক্যাশ অন সার্ভিস (পরিশোধ কাজ শেষের পর)'
+                        : 'Cash After Service Only'}
+                    </span>
+                    <span className="px-1.5 py-0.5 rounded-full text-[9px] bg-emerald-200/80 text-emerald-800 font-extrabold uppercase">৳০ অগ্রিম</span>
                   </p>
-                  <p className="text-[11px] text-emerald-700 mt-0.5">
+                  <p className="text-[11px] text-emerald-700/90 mt-0.5 leading-relaxed">
                     {language === 'bn'
                       ? 'কোনো অগ্রিম পেমেন্ট বা অনলাইন চার্জ নেই। সার্ভিস সফলভাবে সম্পন্ন হওয়ার পর টেকনিশিয়ানকে সরাসরি ক্যাশে পরিশোধ করুন।'
                       : 'No prepayment or card required. Pay the technician directly in cash only after the work is satisfactorily completed.'}
@@ -343,13 +373,13 @@ export const BookingModal: React.FC<Props> = ({
                 </div>
               </div>
 
-              {/* Submit Button */}
+              {/* Submit Button with 3D Tactile Physics */}
               <div className="pt-2 flex items-center justify-between">
-                <div>
-                  <span className="text-[10px] text-gray-500 block">
+                <div className="p-2 rounded-xl bg-slate-50 border border-slate-100">
+                  <span className="text-[10px] text-slate-400 block font-semibold uppercase">
                     {language === 'bn' ? 'মূল্য:' : 'Estimated Price:'}
                   </span>
-                  <span className="text-base font-extrabold text-gray-900">
+                  <span className="text-base font-extrabold text-slate-900">
                     ৳{service.basePrice.toLocaleString()}
                   </span>
                 </div>
@@ -357,7 +387,7 @@ export const BookingModal: React.FC<Props> = ({
                 <button
                   type="submit"
                   disabled={loading}
-                  className="inline-flex items-center gap-2 px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-md transition-all disabled:opacity-50"
+                  className="btn-3d inline-flex items-center gap-2 px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-3d-emerald transition-all disabled:opacity-50"
                 >
                   {loading ? (
                     <Loader2 className="w-4 h-4 animate-spin" />

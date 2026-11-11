@@ -8,33 +8,36 @@ export const Footer: React.FC = () => {
   return (
     <footer className="bg-gray-900 text-gray-300 pt-12 pb-8 border-t border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Value Prop Highlights */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pb-10 border-b border-gray-800">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center text-emerald-400">
+        {/* 3D Value Prop Highlights */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pb-10 border-b border-slate-800 perspective-1000">
+          <div className="tile-3d preserve-3d p-4 rounded-2xl bg-slate-900/80 border border-slate-800/90 shadow-sm flex items-center gap-3.5 hover:border-emerald-500/40">
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-slate-800 to-emerald-950/70 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-inner shrink-0 animate-float-3d">
               <Banknote className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="font-semibold text-white text-sm">{t.badges.cashOnly}</h4>
-              <p className="text-xs text-gray-400">{t.badges.zeroCostNotice}</p>
+              <h4 className="font-bold text-white text-sm flex items-center gap-1.5">
+                <span>{t.badges.cashOnly}</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              </h4>
+              <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">{t.badges.zeroCostNotice}</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center text-emerald-400">
+          <div className="tile-3d preserve-3d p-4 rounded-2xl bg-slate-900/80 border border-slate-800/90 shadow-sm flex items-center gap-3.5 hover:border-emerald-500/40">
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-slate-800 to-emerald-950/70 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-inner shrink-0 animate-float-3d">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="font-semibold text-white text-sm">{t.badges.verifiedPros}</h4>
-              <p className="text-xs text-gray-400">National ID & police verified profile vetting</p>
+              <h4 className="font-bold text-white text-sm">{t.badges.verifiedPros}</h4>
+              <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">National ID & police verified profile vetting</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center text-emerald-400">
+          <div className="tile-3d preserve-3d p-4 rounded-2xl bg-slate-900/80 border border-slate-800/90 shadow-sm flex items-center gap-3.5 hover:border-emerald-500/40">
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-slate-800 to-emerald-950/70 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-inner shrink-0 animate-float-3d">
               <MapPin className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="font-semibold text-white text-sm">{t.badges.coverage}</h4>
-              <p className="text-xs text-gray-400">{t.footer.dhakaNotice}</p>
+              <h4 className="font-bold text-white text-sm">{t.badges.coverage}</h4>
+              <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">{t.footer.dhakaNotice}</p>
             </div>
           </div>
         </div>
