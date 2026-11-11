@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '../context/LanguageContext.js';
 import { fetchCategories, searchServices } from '../services/api.js';
@@ -25,6 +25,8 @@ import {
   Loader2,
   RefreshCw,
   AlertCircle,
+  X,
+  Tag,
 } from 'lucide-react';
 import { DHAKA_AREAS } from '../constants/areas.js';
 
@@ -39,11 +41,29 @@ const FALLBACK_CATEGORIES = [
   { id: 'pest-control', icon: Bug, en: 'Pest Control', bn: 'পোকামাকড় দমন' },
 ];
 
+const POPULAR_SEARCH_CHIPS = [
+  { en: 'AC Servicing', bn: 'এসি সার্ভিসিং' },
+  { en: 'Electrician', bn: 'ইলেকট্রিশিয়ান' },
+  { en: 'Plumbing', bn: 'প্লাম্বিং' },
+  { en: 'Home Cleaning', bn: 'বাড়ি পরিষ্কার' },
+  { en: 'Painting', bn: 'রং মিস্ত্রি' },
+  { en: 'Appliance Repair', bn: 'অ্যাপ্লায়েন্স মেরামত' },
+];
+
 export const HomePage: React.FC = () => {
   const { language, t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [selectedArea, setSelectedArea] = useState('');
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+
+  // Debounce search term to avoid redundant network requests
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm.trim());
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   // Fetch live categories from backend
   const { data: categories } = useQuery({
@@ -60,10 +80,10 @@ export const HomePage: React.FC = () => {
     isError: isServicesError,
     refetch: refetchServices,
   } = useQuery({
-    queryKey: ['services', searchTerm, selectedArea, activeCategory],
+    queryKey: ['services', debouncedSearchTerm, selectedArea, activeCategory],
     queryFn: () =>
       searchServices({
-        q: searchTerm || undefined,
+        q: debouncedSearchTerm || undefined,
         area: selectedArea || undefined,
         category: activeCategory || undefined,
       }),
@@ -73,6 +93,18 @@ export const HomePage: React.FC = () => {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    const servicesSection = document.getElementById('services');
+    if (servicesSection) {
+      servicesSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleChipClick = (chipTerm: string) => {
+    setSearchTerm(chipTerm);
+    const servicesSection = document.getElementById('services');
+    if (servicesSection) {
+      servicesSection.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   const [selectedServiceForBooking, setSelectedServiceForBooking] = useState<Service | null>(null);
@@ -125,6 +157,15 @@ export const HomePage: React.FC = () => {
                 placeholder={t.hero.searchPlaceholder}
                 className="w-full text-sm outline-none text-gray-800 placeholder-gray-400 bg-transparent"
               />
+              {searchTerm && (
+                <button
+                  type="button"
+                  onClick={() => setSearchTerm('')}
+                  className="p-1 text-gray-400 hover:text-gray-600 rounded-full"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
             </div>
 
             {/* Area Dropdown (Zero-Cost Local Geocoding) */}
@@ -153,6 +194,32 @@ export const HomePage: React.FC = () => {
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
+
+          {/* Popular Search Chips */}
+          <div className="mt-4 flex flex-wrap justify-center items-center gap-2">
+            <span className="text-[11px] text-gray-400 flex items-center gap-1 font-medium">
+              <Tag className="w-3 h-3" />
+              <span>{language === 'bn' ? 'জনপ্রিয় সার্চ:' : 'Popular:'}</span>
+            </span>
+            {POPULAR_SEARCH_CHIPS.map((chip, idx) => {
+              const label = language === 'bn' ? chip.bn : chip.en;
+              const isSelected = searchTerm.toLowerCase() === label.toLowerCase();
+              return (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => handleChipClick(label)}
+                  className={`px-2.5 py-1 rounded-full text-xs transition-colors font-medium ${
+                    isSelected
+                      ? 'bg-brand-600 text-white shadow-sm'
+                      : 'bg-white/80 hover:bg-white text-gray-700 border border-gray-200/80 hover:border-brand-400 shadow-2xs'
+                  }`}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
 
           {/* Key Value Badges */}
           <div className="mt-6 flex flex-wrap justify-center items-center gap-6 text-xs text-gray-500 font-medium">
@@ -270,6 +337,79 @@ export const HomePage: React.FC = () => {
             </button>
           )}
         </div>
+
+        {/* Active Filter Pills */}
+        {(debouncedSearchTerm || selectedArea || activeCategory) && (
+          <div className="flex flex-wrap items-center gap-2 mb-6 p-3 bg-gray-50/80 rounded-2xl border border-gray-100">
+            <span className="text-xs text-gray-500 font-semibold mr-1">
+              {language === 'bn' ? 'সক্রিয় ফিল্টার:' : 'Active Filters:'}
+            </span>
+
+            {debouncedSearchTerm && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white border border-brand-200 text-brand-700 shadow-2xs">
+                <Search className="w-3 h-3 text-brand-500" />
+                <span>"{debouncedSearchTerm}"</span>
+                <button
+                  type="button"
+                  onClick={() => setSearchTerm('')}
+                  className="hover:text-red-500 ml-0.5"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+
+            {selectedArea && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white border border-emerald-200 text-emerald-800 shadow-2xs">
+                <MapPin className="w-3 h-3 text-emerald-600" />
+                <span>
+                  {language === 'bn'
+                    ? DHAKA_AREAS.find((a) => a.id === selectedArea)?.bn || selectedArea
+                    : DHAKA_AREAS.find((a) => a.id === selectedArea)?.en || selectedArea}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setSelectedArea('')}
+                  className="hover:text-red-500 ml-0.5"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+
+            {activeCategory && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white border border-purple-200 text-purple-800 shadow-2xs">
+                <Tag className="w-3 h-3 text-purple-600" />
+                <span>
+                  {categories?.find((c) => c._id === activeCategory)?.name
+                    ? language === 'bn'
+                      ? categories?.find((c) => c._id === activeCategory)?.name.bn
+                      : categories?.find((c) => c._id === activeCategory)?.name.en
+                    : activeCategory}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setActiveCategory(null)}
+                  className="hover:text-red-500 ml-0.5"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+
+            <button
+              type="button"
+              onClick={() => {
+                setSearchTerm('');
+                setSelectedArea('');
+                setActiveCategory(null);
+              }}
+              className="text-xs text-red-600 hover:text-red-700 font-bold ml-auto hover:underline"
+            >
+              {language === 'bn' ? 'সব মুছুন' : 'Clear all'}
+            </button>
+          </div>
+        )}
 
         {/* Loading State */}
         {isServicesLoading && (

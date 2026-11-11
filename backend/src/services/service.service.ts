@@ -68,15 +68,27 @@ export class ServiceService {
 
     const mongoQuery: FilterQuery<IService> = { isActive: true };
 
-    // 1. Text Query (Search in English or Bangla)
+    // 1. Text Query (Search in English, Bangla, and matching Category names)
     if (filter.q) {
       const escaped = filter.q.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
       const regex = new RegExp(escaped, 'i');
+
+      const matchingCats = await Category.find({
+        $or: [
+          { 'name.en': regex },
+          { 'name.bn': regex },
+          { slug: regex },
+        ],
+      }).select('_id');
+
+      const catIds = matchingCats.map((c) => c._id);
+
       mongoQuery.$or = [
         { 'name.en': regex },
         { 'name.bn': regex },
         { 'description.en': regex },
         { 'description.bn': regex },
+        ...(catIds.length > 0 ? [{ category: { $in: catIds } }] : []),
       ];
     }
 
@@ -104,13 +116,20 @@ export class ServiceService {
 
     // 5. Area Filter (Zero-cost local discovery: matches services offered by providers in that Dhaka area)
     if (filter.area) {
+      const cleanArea = filter.area.toLowerCase().trim();
       const listingsInArea = await ProviderServiceListing.find({
-        serviceAreas: filter.area.toLowerCase().trim(),
+        serviceAreas: cleanArea,
         isActive: true,
       }).select('service');
 
       const serviceIdsInArea = listingsInArea.map((l) => l.service);
-      mongoQuery._id = { $in: serviceIdsInArea };
+      const totalActiveListings = await ProviderServiceListing.countDocuments({ isActive: true });
+
+      // If active provider listings exist in the system, filter strictly by this area's listings
+      if (totalActiveListings > 0) {
+        mongoQuery._id = { $in: serviceIdsInArea };
+      }
+      // Otherwise, all platform standard services remain available across Dhaka metropolitan zones
     }
 
     const [services, total] = await Promise.all([
