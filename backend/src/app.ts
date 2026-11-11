@@ -33,6 +33,7 @@ export const createApp = (): express.Application => {
           allowedOrigins.includes(origin) ||
           env.NODE_ENV === 'development' ||
           origin.endsWith('.pages.dev') ||
+          origin.endsWith('.github.io') ||
           origin.endsWith('.onrender.com') ||
           origin.endsWith('.vercel.app')
         ) {

@@ -1,10 +1,25 @@
 import { io, Socket } from 'socket.io-client';
 
-const SOCKET_URL =
-  import.meta.env.VITE_SOCKET_URL ||
-  (import.meta.env.VITE_API_URL
-    ? import.meta.env.VITE_API_URL.replace('/api/v1', '')
-    : 'http://localhost:5000');
+const getSocketUrl = (): string => {
+  if (typeof window !== 'undefined') {
+    try {
+      const saved = localStorage.getItem('sheba_api_url');
+      if (saved) {
+        return saved.replace('/api/v1', '');
+      }
+    } catch {
+      // Fallback
+    }
+  }
+  return (
+    import.meta.env.VITE_SOCKET_URL ||
+    (import.meta.env.VITE_API_URL
+      ? import.meta.env.VITE_API_URL.replace('/api/v1', '')
+      : 'http://localhost:5000')
+  );
+};
+
+const SOCKET_URL = getSocketUrl();
 
 let socket: Socket | null = null;
 

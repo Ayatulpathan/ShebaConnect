@@ -33,7 +33,27 @@ import type {
   User,
 } from '../types/index.js';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
+const getApiBaseUrl = (): string => {
+  if (typeof window !== 'undefined') {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const backendParam = urlParams.get('backend');
+      if (backendParam) {
+        const clean = backendParam.replace(/\/$/, '');
+        const formatted = clean.endsWith('/api/v1') ? clean : `${clean}/api/v1`;
+        localStorage.setItem('sheba_api_url', formatted);
+        return formatted;
+      }
+      const saved = localStorage.getItem('sheba_api_url');
+      if (saved) return saved;
+    } catch {
+      // Fallback for non-browser environments
+    }
+  }
+  return import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
