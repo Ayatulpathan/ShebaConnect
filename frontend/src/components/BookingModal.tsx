@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext.js';
 import { useAuth } from '../context/AuthContext.js';
 import { createBooking } from '../services/api.js';
@@ -54,6 +54,16 @@ export const BookingModal: React.FC<Props> = ({
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  // Sync contact details when user logs in while modal is open
+  useEffect(() => {
+    if (user?.name && !contactName) {
+      setContactName(user.name);
+    }
+    if (user?.phone && !contactPhone) {
+      setContactPhone(user.phone);
+    }
+  }, [user]);
+
   if (!isOpen || !service) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -74,6 +84,34 @@ export const BookingModal: React.FC<Props> = ({
       return;
     }
 
+    if (!contactName.trim()) {
+      setErrorMsg(
+        language === 'bn'
+          ? 'অনুগ্রহ করে যোগাযোগের নাম প্রদান করুন'
+          : 'Please provide contact name'
+      );
+      return;
+    }
+
+    const bdPhoneRegex = /^(?:\+8801|01)[3-9]\d{8}$/;
+    if (!contactPhone.trim() || !bdPhoneRegex.test(contactPhone.trim())) {
+      setErrorMsg(
+        language === 'bn'
+          ? 'অনুগ্রহ করে সঠিক বাংলাদেশী মোবাইল নম্বর দিন (যেমনঃ 01712345678 বা +8801712345678)'
+          : 'Please enter a valid Bangladeshi mobile number (e.g. 01712345678 or +8801712345678)'
+      );
+      return;
+    }
+
+    if (!addressLine.trim()) {
+      setErrorMsg(
+        language === 'bn'
+          ? 'অনুগ্রহ করে বিস্তারিত ঠিকানা প্রদান করুন (বাড়ি/রোড/ফ্ল্যাট)'
+          : 'Please enter full house/road/flat address details'
+      );
+      return;
+    }
+
     setLoading(true);
     try {
       const booking = await createBooking({
@@ -82,8 +120,8 @@ export const BookingModal: React.FC<Props> = ({
         serviceAddress: {
           area: selectedArea,
           addressLine: addressLine.trim(),
-          contactName: contactName.trim() || user?.name || 'Customer',
-          contactPhone: contactPhone.trim() || user?.phone || '01712345678',
+          contactName: contactName.trim(),
+          contactPhone: contactPhone.trim(),
         },
         scheduledDate: new Date(scheduledDate).toISOString(),
         preferredTimeSlot: timeSlot,

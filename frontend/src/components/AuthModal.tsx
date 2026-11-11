@@ -338,6 +338,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <span>{language === 'bn' ? 'গুগল দিয়ে প্রবেশ করুন' : 'Continue with Google'}</span>
         </button>
 
+        {!import.meta.env.VITE_GOOGLE_CLIENT_ID && (
+          <p className="text-[10px] text-gray-400 text-center mt-1">
+            {language === 'bn'
+              ? '১-ক্লিক ডেমো গুগল যাচাই সক্রিয় (VITE_GOOGLE_CLIENT_ID ঐচ্ছিক)'
+              : 'Instant 1-Click Google Auth Active'}
+          </p>
+        )}
+
         {/* Toggle between login and register */}
         <div className="text-center mt-5 pt-4 border-t border-gray-100 text-xs text-gray-600">
           {mode === 'login' ? (

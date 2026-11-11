@@ -45,7 +45,18 @@ const getApiBaseUrl = (): string => {
         return formatted;
       }
       const saved = localStorage.getItem('sheba_api_url');
-      if (saved) return saved;
+      if (saved) {
+        // If we are running in production and saved points to localhost, clear it
+        if (
+          window.location.hostname !== 'localhost' &&
+          window.location.hostname !== '127.0.0.1' &&
+          saved.includes('localhost')
+        ) {
+          localStorage.removeItem('sheba_api_url');
+        } else {
+          return saved;
+        }
+      }
     } catch {
       // Fallback for non-browser environments
     }
@@ -57,7 +68,7 @@ const API_BASE_URL = getApiBaseUrl();
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
+  timeout: 60000, // 60s tolerance for free tier spin-up
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',

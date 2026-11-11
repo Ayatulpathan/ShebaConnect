@@ -172,7 +172,11 @@ export const CompanyDashboardModal: React.FC<CompanyDashboardModalProps> = ({
     if (!company) return;
     const techId = selectedTechs[bookingId];
     if (!techId) {
-      alert(language === 'bn' ? 'অনুগ্রহ করে টেকনিশিয়ান নির্বাচন করুন' : 'Please select a technician');
+      setErrorMsg(
+        language === 'bn'
+          ? 'অনুগ্রহ করে টেকনিশিয়ান নির্বাচন করুন'
+          : 'Please select a technician to dispatch'
+      );
       return;
     }
 

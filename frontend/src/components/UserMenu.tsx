@@ -8,6 +8,7 @@ import { TechnicianJobsModal } from './TechnicianJobsModal.js';
 import { BookingTrackerModal } from './BookingTrackerModal.js';
 import { ProviderEarningsModal } from './ProviderEarningsModal.js';
 import { AdminDashboardModal } from './AdminDashboardModal.js';
+import { ProfileModal } from './ProfileModal.js';
 import {
   User,
   LogOut,
@@ -31,6 +32,7 @@ export const UserMenu: React.FC = () => {
   const [trackerModalOpen, setTrackerModalOpen] = useState(false);
   const [earningsModalOpen, setEarningsModalOpen] = useState(false);
   const [adminModalOpen, setAdminModalOpen] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'login' | 'register'>('login');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -126,7 +128,7 @@ export const UserMenu: React.FC = () => {
             <button
               onClick={() => {
                 setDropdownOpen(false);
-                alert(language === 'bn' ? 'প্রোফাইল পৃষ্ঠা শিঘ্রই আসছে' : 'Profile page coming soon');
+                setProfileModalOpen(true);
               }}
               className="w-full flex items-center gap-2.5 px-4 py-2 hover:bg-gray-50 text-left"
             >
@@ -137,7 +139,7 @@ export const UserMenu: React.FC = () => {
             <button
               onClick={() => {
                 setDropdownOpen(false);
-                alert(language === 'bn' ? 'ঠিকানা ব্যবস্থাপনা' : 'Address Management');
+                setProfileModalOpen(true);
               }}
               className="w-full flex items-center gap-2.5 px-4 py-2 hover:bg-gray-50 text-left"
             >
@@ -264,6 +266,10 @@ export const UserMenu: React.FC = () => {
         isOpen={adminModalOpen}
         onClose={() => setAdminModalOpen(false)}
         lang={language}
+      />
+      <ProfileModal
+        isOpen={profileModalOpen}
+        onClose={() => setProfileModalOpen(false)}
       />
     </div>
   );

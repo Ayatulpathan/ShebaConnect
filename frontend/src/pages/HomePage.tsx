@@ -22,6 +22,9 @@ import {
   ArrowRight,
   Filter,
   Wrench,
+  Loader2,
+  RefreshCw,
+  AlertCircle,
 } from 'lucide-react';
 import { DHAKA_AREAS } from '../constants/areas.js';
 
@@ -46,11 +49,17 @@ export const HomePage: React.FC = () => {
   const { data: categories } = useQuery({
     queryKey: ['categories'],
     queryFn: fetchCategories,
-    retry: 1,
+    retry: 3,
+    retryDelay: 2500,
   });
 
   // Fetch services based on search, area, and selected category
-  const { data: searchResults } = useQuery({
+  const {
+    data: searchResults,
+    isLoading: isServicesLoading,
+    isError: isServicesError,
+    refetch: refetchServices,
+  } = useQuery({
     queryKey: ['services', searchTerm, selectedArea, activeCategory],
     queryFn: () =>
       searchServices({
@@ -58,7 +67,8 @@ export const HomePage: React.FC = () => {
         area: selectedArea || undefined,
         category: activeCategory || undefined,
       }),
-    retry: 1,
+    retry: 3,
+    retryDelay: 2500,
   });
 
   const handleSearch = (e: React.FormEvent) => {
@@ -228,17 +238,106 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* Services Grid (Live Search Results) */}
-      {searchResults?.services && searchResults.services.length > 0 && (
-        <section id="services" className="py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
-          <div className="flex justify-between items-center mb-6">
+      <section id="services" className="py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+        <div className="flex justify-between items-center mb-6">
+          <div>
             <h3 className="text-xl font-bold text-gray-900">
               {language === 'bn' ? 'উপলব্ধ সেবাসমূহ' : 'Available Services'}
-              <span className="text-sm font-normal text-gray-500 ml-2">
-                ({searchResults.pagination.total} {language === 'bn' ? 'টি সেবা' : 'services'})
-              </span>
+              {searchResults?.pagination?.total !== undefined && (
+                <span className="text-sm font-normal text-gray-500 ml-2">
+                  ({searchResults.pagination.total} {language === 'bn' ? 'টি সেবা' : 'services'})
+                </span>
+              )}
             </h3>
+            <p className="text-xs text-gray-500 mt-0.5">
+              {language === 'bn'
+                ? 'অন-ডিমান্ড ও ভেরিফায়েড হোম সার্ভিস (ক্যাশ অন সার্ভিস)'
+                : 'On-demand verified services with 100% cash after delivery'}
+            </p>
           </div>
 
+          {(searchTerm || selectedArea || activeCategory) && (
+            <button
+              onClick={() => {
+                setSearchTerm('');
+                setSelectedArea('');
+                setActiveCategory(null);
+              }}
+              className="text-xs text-brand-600 font-bold hover:underline flex items-center gap-1"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>{language === 'bn' ? 'ফিল্টার রিসেট' : 'Reset Filters'}</span>
+            </button>
+          )}
+        </div>
+
+        {/* Loading State */}
+        {isServicesLoading && (
+          <div className="text-center py-16 bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
+            <Loader2 className="w-8 h-8 text-brand-600 animate-spin mx-auto mb-3" />
+            <h4 className="text-sm font-bold text-gray-800">
+              {language === 'bn' ? 'সেবাসমূহ লোড হচ্ছে...' : 'Loading verified services...'}
+            </h4>
+            <p className="text-xs text-gray-500 mt-1 max-w-sm mx-auto">
+              {language === 'bn'
+                ? 'রেন্ডার ফ্রি ক্লাউড ব্যাকএন্ড সক্রিয় হতে সামান্য সময় লাগতে পারে।'
+                : 'Connecting to free cloud backend. This may take a moment if waking up from sleep.'}
+            </p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {!isServicesLoading && isServicesError && (
+          <div className="text-center py-12 bg-red-50/70 rounded-2xl border border-red-200 p-8 max-w-lg mx-auto">
+            <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-2" />
+            <h4 className="text-sm font-bold text-gray-900">
+              {language === 'bn' ? 'সার্ভিস লোড করতে সমস্যা হয়েছে' : 'Failed to connect to service backend'}
+            </h4>
+            <p className="text-xs text-gray-600 mt-1 mb-4">
+              {language === 'bn'
+                ? 'ব্যাকএন্ড সার্ভার জাগ্রত হচ্ছে, অনুগ্রহ করে কয়েক সেকেন্ড পর পুনরায় চেষ্টা করুন।'
+                : 'Server might still be waking up. Please click retry.'}
+            </p>
+            <button
+              onClick={() => refetchServices()}
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-xl shadow-sm transition-colors"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>{language === 'bn' ? 'পুনরায় চেষ্টা করুন' : 'Retry Connection'}</span>
+            </button>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!isServicesLoading && !isServicesError && searchResults?.services && searchResults.services.length === 0 && (
+          <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-gray-300 max-w-xl mx-auto p-8 shadow-sm">
+            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 text-gray-400">
+              <Search className="w-6 h-6" />
+            </div>
+            <h4 className="text-base font-bold text-gray-900">
+              {language === 'bn' ? 'কোনো সেবা পাওয়া যায়নি' : 'No Matching Services Found'}
+            </h4>
+            <p className="text-xs text-gray-500 mt-1 max-w-sm mx-auto">
+              {language === 'bn'
+                ? 'আপনার বর্তমান ফিল্টারের সাথে মিলে এমন কোনো সেবা নেই। ফিল্টার পরিবর্তন বা রিসেট করুন।'
+                : 'No services match your current search terms, category, or selected area.'}
+            </p>
+            <button
+              onClick={() => {
+                setSearchTerm('');
+                setSelectedArea('');
+                setActiveCategory(null);
+              }}
+              className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 bg-brand-50 hover:bg-brand-100 text-brand-700 rounded-xl text-xs font-bold transition-colors"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>{language === 'bn' ? 'সকল ফিল্টার রিসেট করুন' : 'Reset All Filters'}</span>
+            </button>
+          </div>
+        )}
+
+        {/* Results Grid */}
+        {!isServicesLoading && !isServicesError && searchResults?.services && searchResults.services.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {searchResults.services.map((service) => (
               <ServiceCard
@@ -248,8 +347,8 @@ export const HomePage: React.FC = () => {
               />
             ))}
           </div>
-        </section>
-      )}
+        )}
+      </section>
 
       {/* Booking Modals */}
       <BookingModal
