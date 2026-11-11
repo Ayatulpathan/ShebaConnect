@@ -4,6 +4,124 @@
 
 @layer base {
   body {
-    @apply selection:bg-brand-500 selection:text-white;
+    @apply selection:bg-brand-500 selection:text-white bg-slate-50 text-slate-900;
   }
+}
+
+/* ==========================================================================
+   3D Spatial, Perspective & Depth System (ShebaConnect 3D Engine)
+   ========================================================================== */
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.perspective-1500 {
+  perspective: 1500px;
+}
+
+.translate-z-10 {
+  transform: translateZ(10px);
+}
+
+.translate-z-20 {
+  transform: translateZ(20px);
+}
+
+.translate-z-30 {
+  transform: translateZ(30px);
+}
+
+.translate-z-40 {
+  transform: translateZ(40px);
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+/* Floating 3D Physics Keyframes */
+@keyframes float-gentle {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(0.5deg);
+  }
+}
+
+@keyframes float-reverse {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(8px) rotate(-0.5deg);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+/* Apply 3D Float with Reduced-Motion Safety */
+.animate-float-3d {
+  transform: translateY(0px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .animate-float-3d {
+    animation: float-gentle 4.5s ease-in-out infinite;
+  }
+  .animate-float-reverse-3d {
+    animation: float-reverse 5.5s ease-in-out infinite;
+  }
+  .animate-pulse-glow {
+    animation: pulse-glow 3s ease-in-out infinite;
+  }
+}
+
+/* 3D Glassmorphism & Isometric Depth Shadows */
+.glass-3d-card {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow:
+    0 10px 30px -10px rgba(0, 0, 0, 0.08),
+    0 20px 45px -15px rgba(16, 185, 129, 0.12),
+    0 0 0 1px rgba(255, 255, 255, 0.9) inset;
+}
+
+.glass-3d-elevated {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow:
+    0 20px 50px -15px rgba(0, 0, 0, 0.12),
+    0 30px 60px -20px rgba(16, 185, 129, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.9) inset;
+}
+
+.shadow-3d-emerald {
+  box-shadow:
+    0 15px 35px -8px rgba(16, 185, 129, 0.35),
+    0 5px 15px -3px rgba(0, 0, 0, 0.08);
+}
+
+.shadow-3d-hero {
+  box-shadow:
+    0 25px 60px -15px rgba(16, 185, 129, 0.22),
+    0 10px 25px -5px rgba(0, 0, 0, 0.05);
 }
