@@ -253,7 +253,7 @@ export class AuthService {
       email_verified?: string | boolean;
       name?: string;
       picture?: string;
-    };
+    } | null = null;
 
     // Support deterministic mock tokens for unit / integration tests
     if (idToken.startsWith('mock-google-token:')) {
@@ -265,20 +265,81 @@ export class AuthService {
         email_verified: true,
       };
     } else {
+      let verified = false;
+
+      // 1. Try standard Google OAuth tokeninfo
       try {
         const response = await fetch(
           `https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(idToken)}`
         );
-        if (!response.ok) {
-          throw new Error('Google tokeninfo rejected token');
+        if (response.ok) {
+          const data = (await response.json()) as {
+            sub?: string;
+            email?: string;
+            name?: string;
+            picture?: string;
+            email_verified?: string | boolean;
+          };
+          if (data.sub && data.email) {
+            payload = {
+              sub: data.sub,
+              email: data.email.toLowerCase(),
+              name: data.name || data.email.split('@')[0],
+              picture: data.picture,
+              email_verified: data.email_verified === true || data.email_verified === 'true',
+            };
+            verified = true;
+          }
         }
-        payload = (await response.json()) as typeof payload;
       } catch {
+        // Fallback to Firebase Identity Toolkit
+      }
+
+      // 2. Fallback: Google Identity Toolkit (Firebase Auth token)
+      if (!verified) {
+        try {
+          const apiKey = process.env.FIREBASE_API_KEY || 'AIzaSyDcvOWmVDpn1VX2FWnmPU1NyqhrhGTviZQ';
+          const fbRes = await fetch(
+            `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${apiKey}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ idToken }),
+            }
+          );
+          if (fbRes.ok) {
+            const fbData = (await fbRes.json()) as {
+              users?: Array<{
+                localId: string;
+                email: string;
+                displayName?: string;
+                photoUrl?: string;
+                emailVerified?: boolean;
+              }>;
+            };
+            const fbUser = fbData.users?.[0];
+            if (fbUser && fbUser.email) {
+              payload = {
+                sub: fbUser.localId,
+                email: fbUser.email.toLowerCase(),
+                name: fbUser.displayName || fbUser.email.split('@')[0],
+                picture: fbUser.photoUrl,
+                email_verified: fbUser.emailVerified ?? true,
+              };
+              verified = true;
+            }
+          }
+        } catch {
+          // Token rejected
+        }
+      }
+
+      if (!verified || !payload || !payload.sub || !payload.email) {
         throw AppError.unauthorized('Invalid or expired Google authentication token', 'INVALID_GOOGLE_TOKEN');
       }
     }
 
-    if (!payload.sub || !payload.email) {
+    if (!payload || !payload.sub || !payload.email) {
       throw AppError.unauthorized('Google token does not contain required user identity', 'INVALID_GOOGLE_TOKEN');
     }
 
